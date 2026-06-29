@@ -1,113 +1,229 @@
 /* ===========================================
-   styles.css — Базовые стили проекта
-   Tailwind utilities — в HTML/JS разметке.
-   Здесь: CSS-переменные, анимации, утилиты.
+   styles.css — Modern SaaS Dashboard Theme
    =========================================== */
 
-/* ── Переменные темы ─────────────────────────
-   По умолчанию — светлая тема.
-   При подключении Notibot Bridge эти значения
-   перезаписываются из app.colors автоматически.
-   ────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
 :root {
-  --color-bg:      #ffffff;
-  --color-text:    #0f172a;
-  --color-muted:   #64748b;
-  --color-accent:  #6366f1;
-  --color-surface: rgba(0, 0, 0, 0.04);
-  --color-border:  rgba(0, 0, 0, 0.08);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg:      #0f172a;
-    --color-text:    #f1f5f9;
-    --color-muted:   #94a3b8;
-    --color-accent:  #818cf8;
-    --color-surface: rgba(255, 255, 255, 0.06);
-    --color-border:  rgba(255, 255, 255, 0.1);
-  }
-}
-
-/* ── Базовые стили ───────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
+  --color-bg: #090d16;
+  --color-surface: rgba(17, 24, 39, 0.75);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-text: #f8fafc;
+  --color-muted: #94a3b8;
+  
+  /* Category Colors */
+  --cat-traffic: #10b981;
+  --cat-traffic-glow: rgba(16, 185, 129, 0.25);
+  
+  --cat-vk: #0077ff;
+  --cat-vk-glow: rgba(0, 119, 255, 0.25);
+  
+  --cat-bot: #8b5cf6;
+  --cat-bot-glow: rgba(139, 92, 246, 0.25);
+  
+  --cat-seg: #f59e0b;
+  --cat-seg-glow: rgba(245, 158, 11, 0.25);
+  
+  --cat-sale: #ef4444;
+  --cat-sale-glow: rgba(239, 68, 68, 0.35);
 }
 
 body {
-  margin: 0;
-  padding: 0;
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
   background-color: var(--color-bg);
   color: var(--color-text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(0, 119, 255, 0.07) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.07) 0%, transparent 40%);
+  background-attachment: fixed;
+  overflow-x: hidden;
 }
 
-/* ── Safe Areas (iOS) ────────────────────── */
-.safe-top    { padding-top:    env(safe-area-inset-top,    0px); }
-.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
-
-/* ── Анимации ────────────────────────────── */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0);    }
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1;   }
-  50%       { opacity: 0.5; }
-}
-
-.fade-in   { animation: fadeIn  0.35s ease forwards; }
-.slide-up  { animation: slideUp 0.4s  ease forwards; }
-.pulse     { animation: pulse   1.5s  ease infinite; }
-
-/* ── Эффект нажатия на кнопки ────────────── */
-.btn-press {
-  transition: transform 0.1s ease, opacity 0.1s ease;
-  cursor: pointer;
-}
-.btn-press:active {
-  transform: scale(0.96);
-  opacity: 0.8;
-}
-
-/* ── Переиспользуемые UI-блоки ───────────── */
-.card {
+/* Glassmorphism card */
+.glass-card {
   background: var(--color-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-border);
-  border-radius: 16px;
-  padding: 16px;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
 }
 
-.btn-primary {
-  display: block;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mermaid Customization & SaaS Styling */
+.mermaid-wrapper {
+  position: relative;
   width: 100%;
-  padding: 14px 24px;
-  background: var(--color-accent);
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.1s ease;
+  overflow-x: auto;
+  padding: 24px 12px;
+  cursor: grab;
 }
-.btn-primary:active {
-  transform: scale(0.97);
-  opacity: 0.9;
+.mermaid-wrapper:active {
+  cursor: grabbing;
 }
 
-.divider {
-  height: 1px;
-  background: var(--color-border);
-  margin: 16px 0;
+.mermaid svg {
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 0 auto;
+  display: block;
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Cluster Subgraph styling inside Mermaid SVG */
+.mermaid .cluster rect {
+  fill: rgba(15, 23, 42, 0.4) !important;
+  stroke: rgba(255, 255, 255, 0.08) !important;
+  stroke-width: 1.5px !important;
+  rx: 16px !important;
+  ry: 16px !important;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+.mermaid .cluster span.nodeLabel {
+  color: #94a3b8 !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Smooth Curved Arrow Links */
+.mermaid .edgePath .path {
+  stroke: #475569 !important;
+  stroke-width: 2.2px !important;
+  transition: all 0.3s ease;
+}
+
+.mermaid .edgePath .path:hover {
+  stroke: #38bdf8 !important;
+  stroke-width: 3.5px !important;
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.5));
+}
+
+.mermaid .marker {
+  fill: #475569 !important;
+  stroke: #475569 !important;
+}
+
+/* Custom Node Styles applied via classDef */
+.mermaid .node rect, 
+.mermaid .node polygon, 
+.mermaid .node circle,
+.mermaid .node div {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, filter 0.25s ease !important;
+  rx: 12px !important;
+  ry: 12px !important;
+}
+
+.mermaid .node:hover {
+  filter: brightness(1.15) !important;
+  cursor: pointer;
+}
+
+/* Category Specific Node Styling */
+.traffic-style rect, .traffic-style polygon, .traffic-style div {
+  fill: #064e3b !important;
+  stroke: var(--cat-traffic) !important;
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 4px 12px var(--cat-traffic-glow)) !important;
+}
+.traffic-style label, .traffic-style span {
+  color: #ecfdf5 !important;
+  font-weight: 600 !important;
+}
+
+.vk-style rect, .vk-style polygon, .vk-style div {
+  fill: #1e3a8a !important;
+  stroke: var(--cat-vk) !important;
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 4px 12px var(--cat-vk-glow)) !important;
+}
+.vk-style label, .vk-style span {
+  color: #eff6ff !important;
+  font-weight: 600 !important;
+}
+
+.bot-style rect, .bot-style polygon, .bot-style div {
+  fill: #4c1d95 !important;
+  stroke: var(--cat-bot) !important;
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 4px 12px var(--cat-bot-glow)) !important;
+}
+.bot-style label, .bot-style span {
+  color: #f5f3ff !important;
+  font-weight: 600 !important;
+}
+
+.seg-style rect, .seg-style polygon, .seg-style div {
+  fill: #78350f !important;
+  stroke: var(--cat-seg) !important;
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 4px 12px var(--cat-seg-glow)) !important;
+}
+.seg-style label, .seg-style span {
+  color: #fffbeb !important;
+  font-weight: 600 !important;
+}
+
+.sale-style rect, .sale-style polygon, .sale-style div {
+  fill: #831843 !important;
+  stroke: var(--cat-sale) !important;
+  stroke-width: 2.5px !important;
+  filter: drop-shadow(0 4px 20px var(--cat-sale-glow)) !important;
+  animation: pulseGlow 2.5s infinite alternate ease-in-out;
+}
+.sale-style label, .sale-style span {
+  color: #fff1f2 !important;
+  font-weight: 700 !important;
+}
+
+@keyframes pulseGlow {
+  0% {
+    filter: drop-shadow(0 4px 12px rgba(239, 68, 68, 0.4));
+  }
+  100% {
+    filter: drop-shadow(0 4px 24px rgba(239, 68, 68, 0.8));
+  }
+}
+
+/* Tooltip / Drawer Animations */
+.animate-slide-in {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 768px) {
+  .mermaid svg {
+    min-width: 650px !important;
+  }
 }

@@ -1,31 +1,533 @@
 // js/app.js
-// Главная точка входа приложения.
-// Здесь импортируются и собираются все компоненты.
-
 import { initIcons } from './utils.js';
 
-// Импортируй компоненты по мере их создания:
-// import { renderHeader }   from './components/header.js';
-// import { renderQuiz }     from './components/quiz.js';
-// import { renderLanding }  from './components/landing.js';
+// Данные для каждого узла воронки (Hover-инфо, подсказки и аналитика)
+const funnelData = {
+  'T1': {
+    title: 'Таргетированная реклама',
+    category: 'Источники трафика',
+    color: '#10b981',
+    badge: 'Трафик',
+    icon: 'target',
+    summary: 'Официальная реклама VK Ads, маркет-платформа и контекстные кампании.',
+    details: 'Прямой запуск объявлений на целевые аудитории (по интересам, ключевым словам, ретаргетинг). Главная задача — обеспечить максимальный CTR и низкую стоимость клика (CPC).',
+    recommendation: 'Используйте динамические креативы и сегментируйте аудитории по боли.'
+  },
+  'T2': {
+    title: 'Блогеры & Инфлюенсеры',
+    category: 'Источники трафика',
+    color: '#10b981',
+    badge: 'Трафик',
+    icon: 'users',
+    summary: 'Прямые интеграции и нативные обзоры у тематических лидеров мнений.',
+    details: 'Привлечение тёплого лояльного трафика через рекомендации авторов контента. Высокий уровень доверия и вовлеченности.',
+    recommendation: 'Проверяйте вовлеченность (ER) паблика и используйте персональные промокоды.'
+  },
+  'T3': {
+    title: 'Органический трафик',
+    category: 'Источники трафика',
+    color: '#10b981',
+    badge: 'Трафик',
+    icon: 'sparkles',
+    summary: 'VK Клипы, умная лента рекомендаций, виральные статьи и SEO.',
+    details: 'Бесплатный охват за счет качественного регулярного контента. Алгоритмы VK продвигают интересные клипы и уникальные лонгриды на новую аудиторию.',
+    recommendation: 'Публикуйте от 3 до 5 Клипов в неделю с призывом забрать бонус в шапке профиля.'
+  },
+  'T4': {
+    title: 'Посевы в пабликах',
+    category: 'Источники трафика',
+    color: '#10b981',
+    badge: 'Трафик',
+    icon: 'share-2',
+    summary: 'Публикация рекламных постов в тематических сообществах VK.',
+    details: 'Закупка рекламных мест напрямую у администраторов групп или через биржу. Отлично подходит для массовых и нишевых продуктов.',
+    recommendation: 'Анализируйте часовой график активности сообществ перед выходом поста.'
+  },
+  'A': {
+    title: 'Центральный хаб Трафика',
+    category: 'Точка сбора',
+    color: '#10b981',
+    badge: 'Главный узел',
+    icon: 'zap',
+    summary: 'Агрегатор всех входящих потоков целевой аудитории.',
+    details: 'Сюда стекаются все рекламные и органические касания. Здесь измеряется суммарный объём входящего потока и средняя стоимость привлечения пользователя (CAC).',
+    recommendation: 'Настройте UTМ-метки для каждого источника для точной аналитики.'
+  },
+  'B': {
+    title: 'VK входная оболочка',
+    category: 'VK система',
+    color: '#0077ff',
+    badge: 'VK Экосистема',
+    icon: 'layout',
+    summary: 'Первое визуальное касание: меню, виджеты, обложка и товары группы.',
+    details: 'Упаковка паблика VK. Посетитель за 3 секунды должен понять, чем вы полезны, и увидеть четкий призыв к действию (CTA) в меню или виджете.',
+    recommendation: 'Используйте яркие динамические обложки и лаконичные кнопки меню.'
+  },
+  'C': {
+    title: 'Точка входа (Распределение)',
+    category: 'Логический шлюз',
+    color: '#f59e0b',
+    badge: 'Развилка',
+    icon: 'git-branch',
+    summary: 'Выбор оптимального пути конверсии для пользователя.',
+    details: 'Система определяет, отправить пользователя сразу в чат-бот или на полноценный конверсионный мини-лендинг в Senler / Mini App.',
+    recommendation: 'Тестируйте A/B сплит для сравнения конверсий обоих путей.'
+  },
+  'D1': {
+    title: 'Прямая модель воронки',
+    category: 'Сегментация',
+    color: '#f59e0b',
+    badge: 'Прямой путь',
+    icon: 'arrow-right-circle',
+    summary: 'Мгновенный старт диалога с ботом по кодовому слову или кнопке.',
+    details: 'Минимальное трение. Пользователь сразу попадает в личные сообщения группы без лишних шагов. Максимальная конверсия из клика в сообщение.',
+    recommendation: 'Используйте короткие кодовые слова в рекламе (например, "СТАРТ").'
+  },
+  'D2': {
+    title: 'Через посадочную страницу',
+    category: 'Сегментация',
+    color: '#f59e0b',
+    badge: 'Лендинг',
+    icon: 'monitor',
+    summary: 'Подписка через подписную страницу Senler / VK Mini App.',
+    details: 'Предоставляет больше информации и прогрева перед подпиской. Позволяет собрать дополнительные данные о пользователе и сформировать завышенное ожидание от продукта.',
+    recommendation: 'Размещайте отзывы и видео-превью прямо на посадочной странице.'
+  },
+  'E': {
+    title: 'Чат-бот (Ядро воронки)',
+    category: 'Автоматизация',
+    color: '#8b5cf6',
+    badge: 'Ядро системы',
+    icon: 'bot',
+    summary: 'Автоматический сценарий взаимодействия в личных сообщениях.',
+    details: 'Приветствие, выдача первого обещания, вовлечение в диалог через интерактивные кнопки. Бот работает 24/7 без участия менеджера.',
+    recommendation: 'Делайте сообщения короткими (до 300 символов) и используйте переменные имени.'
+  },
+  'F': {
+    title: 'Сегментация пользователей',
+    category: 'Автоматизация',
+    color: '#8b5cf6',
+    badge: 'Анализ',
+    icon: 'filter',
+    summary: 'Квалификация лида через опросы и выбор интересов.',
+    details: 'Бот задает 1-3 вопроса для определения потребностей и уровня готовности к покупке. На основе ответов присваиваются метки (теги) в базе.',
+    recommendation: 'Не перегружайте вопросами — 2 вопроса с кнопками выбора дают 90%+ прохождений.'
+  },
+  'G1': {
+    title: 'Лёгкий лид-магнит',
+    category: 'Продукт',
+    color: '#f59e0b',
+    badge: 'Быстрая польза',
+    icon: 'gift',
+    summary: 'Быстрый бонус: гайд, чек-лист, шаблон или шпаргалка.',
+    details: 'Идеально для горячей аудитории, которой нужно быстрое решение проблемы. Повышает лояльность и доказывает экспертность.',
+    recommendation: 'Давайте материал мгновенно в первом же сообщении после выбора.'
+  },
+  'G2': {
+    title: 'Углублённый продукт',
+    category: 'Продукт',
+    color: '#f59e0b',
+    badge: 'Контент-погружение',
+    icon: 'book-open',
+    summary: 'Мини-курс, запись вебинара, разбор кейса или тест-драйв.',
+    details: 'Предназначен для холодного или сомневающегося трафика. Требует больше времени на изучение, но создает глубокое доверие.',
+    recommendation: 'Разбивайте мини-курс на короткие уроки по 5 минут.'
+  },
+  'H': {
+    title: 'Контентный Прогрев',
+    category: 'Воронка продаж',
+    color: '#f59e0b',
+    badge: 'Автоворонка',
+    icon: 'flame',
+    summary: 'Серия ценностных писем, демонстрация результатов и кейсов.',
+    details: 'Последовательная цепочка сообщений, закрывающая основные возражения (дорого, не сработает, нет времени). Формирует острое желание приобрести основной продукт.',
+    recommendation: 'Используйте элемент сторителлинга и ограничивайте время действия спецпредложений.'
+  },
+  'I': {
+    title: 'Финал: Продажа & Конверсия',
+    category: 'Конверсия',
+    color: '#ef4444',
+    badge: 'Финальный этап',
+    icon: 'shopping-bag',
+    summary: 'Прямой оффер, ссылка на оплату, работа менеджера продаж.',
+    details: 'Ключевая цель всей воронки. Перевод подогретого потенциального клиента в статус оплатившего покупателя.',
+    recommendation: 'Подключите виджет быстрой оплаты VK Pay / эквайринг и автовыдачу доступа.'
+  }
+};
 
 /**
- * Инициализация и рендер приложения.
+ * Инициализация UI Дашборда
  */
-function initApp() {
+function renderDashboard() {
   const appEl = document.getElementById('app');
-
+  
   appEl.innerHTML = `
-    <main class="max-w-xl mx-auto px-6 pt-8 pb-8 safe-top safe-bottom fade-in">
-      <h1 class="text-2xl font-bold mb-2">My Vibe App</h1>
-      <p style="color: var(--color-muted)" class="text-sm">
-        Проект готов. Попроси агента создать что угодно — квиз, лендинг, игру…
-      </p>
+    <!-- Top Bar Navigation -->
+    <header class="border-b border-white/10 bg-[#0d1322]/80 backdrop-blur-md sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-vk-blue p-0.5 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <div class="w-full h-full bg-[#090d16] rounded-[10px] flex items-center justify-center">
+              <i data-lucide="workflow" class="w-5 h-5 text-indigo-400"></i>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base sm:text-lg font-bold tracking-tight text-white font-heading">VK-ВОРОНКА</h1>
+              <span class="px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">Interactive SaaS Map</span>
+            </div>
+            <p class="text-xs text-slate-400 hidden sm:block">Архитектура интерактивной карты конверсии • Notibot Ecosystem</p>
+          </div>
+        </div>
+
+        <!-- Toolbar Buttons -->
+        <div class="flex items-center gap-2">
+          <button id="btn-zoom-in" title="Увеличить" class="btn-press p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
+            <i data-lucide="zoom-in" class="w-4 h-4"></i>
+          </button>
+          <button id="btn-zoom-out" title="Уменьшить" class="btn-press p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
+            <i data-lucide="zoom-out" class="w-4 h-4"></i>
+          </button>
+          <button id="btn-reset-zoom" title="Сбросить масштаб" class="btn-press px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span class="hidden md:inline">Сброс</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Legend / Filter Pills Bar -->
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl glass-card">
+        <div class="flex items-center gap-2">
+          <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i>
+          <span class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Категории:</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Трафик
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <span class="w-2 h-2 rounded-full bg-blue-400"></span> VK Оболочка
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <span class="w-2 h-2 rounded-full bg-purple-400"></span> Бот / Ядро
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Сегментация
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-sm shadow-rose-500/20">
+            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> Продажи
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Interactive Diagram Workspace (Cols 8) -->
+        <section class="lg:col-span-8 glass-card rounded-2xl p-4 sm:p-6 relative overflow-hidden min-h-[600px] flex flex-col justify-between">
+          
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h2 class="text-sm font-semibold text-slate-200 font-heading">Интерактивная Схема Воронки</h2>
+            </div>
+            <span class="text-xs text-slate-400 flex items-center gap-1">
+              <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5 text-indigo-400"></i>
+              Наведите или кликните на узел
+            </span>
+          </div>
+
+          <!-- Mermaid Render Container -->
+          <div id="diagram-viewport" class="mermaid-wrapper flex-1 flex items-center justify-center transition-transform duration-200 origin-center">
+            <div class="mermaid">
+flowchart TD
+
+subgraph T[Источники трафика]
+T1[Реклама]
+T2[Блогеры]
+T3[Органика]
+T4[Посевы]
+end
+
+A[Трафик]
+B[VK входная оболочка]
+C{Вход}
+D1[Прямая модель]
+D2[Через посадочную]
+
+subgraph BOT[Ядро]
+E[Бот]
+F[Сегментация]
+end
+
+G1[Лёгкий лид-магнит]
+G2[Углублённый продукт]
+H[Прогрев]
+I[Продажа]
+
+subgraph VK[VK система]
+B
+end
+
+T1 --> A
+T2 --> A
+T3 --> A
+T4 --> A
+
+A --> B
+B --> C
+C --> D1
+C --> D2
+
+D1 --> E
+D2 --> E
+
+E --> F
+F --> G1
+F --> G2
+
+G1 --> H
+G2 --> H
+
+H --> I
+
+classDef trafficStyle fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#fff;
+classDef vkStyle fill:#1e3a8a,stroke:#0077ff,stroke-width:2px,color:#fff;
+classDef botStyle fill:#4c1d95,stroke:#8b5cf6,stroke-width:2px,color:#fff;
+classDef segStyle fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#fff;
+classDef saleStyle fill:#831843,stroke:#ef4444,stroke-width:2.5px,color:#fff;
+
+class T1,T2,T3,T4,A trafficStyle;
+class B,VK vkStyle;
+class E,F,BOT botStyle;
+class C,D1,D2,G1,G2,H segStyle;
+class I saleStyle;
+            </div>
+          </div>
+
+          <!-- Bottom status info bar -->
+          <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
+            <div class="flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-indigo-400"></i>
+              <span>Структура и логика связей 100% сохранены</span>
+            </div>
+            <span class="text-[11px] bg-white/5 px-2 py-0.5 rounded text-slate-400">v2.4 SaaS UI</span>
+          </div>
+        </section>
+
+        <!-- Dynamic Inspector / Hover Panel (Cols 4) -->
+        <aside class="lg:col-span-4 glass-card rounded-2xl p-6 sticky top-24">
+          <div id="inspector-panel" class="transition-all duration-300">
+            <!-- Default Placeholder -->
+            <div id="inspector-placeholder" class="text-center py-12 px-4">
+              <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-4 text-indigo-400">
+                <i data-lucide="sparkles" class="w-8 h-8 animate-bounce"></i>
+              </div>
+              <h3 class="text-base font-bold text-white mb-2 font-heading">Выберите этап воронки</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Наведите курсор или нажмите на любой блок на схеме, чтобы изучить подробные инструкции, рекомендации и UX-пояснения по данному шагу.
+              </p>
+            </div>
+
+            <!-- Active Inspector Card (Hidden by default) -->
+            <div id="inspector-content" class="hidden animate-slide-in">
+              <div class="flex items-center justify-between mb-4">
+                <span id="node-badge" class="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  Категория
+                </span>
+                <span id="node-id-tag" class="text-xs font-mono text-slate-500 font-bold">NODE_ID</span>
+              </div>
+
+              <div class="flex items-start gap-3 mb-4">
+                <div id="node-icon-wrapper" class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-lg">
+                  <i id="node-icon" data-lucide="info" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 id="node-title" class="text-lg font-bold text-white font-heading leading-snug">Название блока</h3>
+                  <p id="node-category" class="text-xs text-slate-400 font-medium">Подкатегория</p>
+                </div>
+              </div>
+
+              <div class="space-y-4 text-xs">
+                <div class="p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Краткая суть:</span>
+                  <p id="node-summary" class="text-slate-200 leading-relaxed font-normal">Пояснение блока</p>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <span class="text-[11px] font-semibold text-indigo-300 uppercase tracking-wider block mb-1.5">Детали и UX-роль:</span>
+                  <p id="node-details" class="text-slate-300 leading-relaxed">Подробная информация о работе данного узла воронки.</p>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-200">
+                  <div class="flex items-center gap-1.5 font-semibold text-emerald-400 mb-1">
+                    <i data-lucide="lightbulb" class="w-4 h-4"></i>
+                    <span>Рекомендация эксперта:</span>
+                  </div>
+                  <p id="node-recommendation" class="leading-relaxed">Практический совет по настройке конверсии.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
     </main>
   `;
 
   initIcons();
+  setupDiagramInteractivity();
 }
 
-// Запуск
-initApp();
+/**
+ * Извлечение оригинального ID узла (например 'T1', 'A', 'B') из DOM элемента Mermaid
+ */
+function extractNodeId(nodeEl) {
+  const fullId = nodeEl.id || '';
+  const textContent = nodeEl.textContent ? nodeEl.textContent.trim() : '';
+
+  // 1. Проверяем точное вхождение ключа в id элементов (например flowchart-T1-10)
+  for (const key of Object.keys(funnelData)) {
+    const parts = fullId.split('-');
+    if (parts.includes(key)) {
+      return key;
+    }
+  }
+
+  // 2. Проверяем по совпадению текста в блоке
+  for (const [key, item] of Object.entries(funnelData)) {
+    if (textContent.includes(item.title) || textContent.includes(key)) {
+      return key;
+    }
+  }
+
+  // 3. Запасной сопоставитель по уникальным словам
+  if (textContent.includes('Трафик') && !textContent.includes('Источники')) return 'A';
+  if (textContent.includes('оболочка')) return 'B';
+  if (textContent.includes('Вход')) return 'C';
+  if (textContent.includes('Прямая модель')) return 'D1';
+  if (textContent.includes('посадочную')) return 'D2';
+  if (textContent.includes('Бот') && !textContent.includes('Блогеры')) return 'E';
+  if (textContent.includes('Сегментация')) return 'F';
+  if (textContent.includes('Лёгкий')) return 'G1';
+  if (textContent.includes('Углублённый')) return 'G2';
+  if (textContent.includes('Прогрев')) return 'H';
+  if (textContent.includes('Продажа')) return 'I';
+  if (textContent.includes('Реклама')) return 'T1';
+  if (textContent.includes('Блогеры')) return 'T2';
+  if (textContent.includes('Органика')) return 'T3';
+  if (textContent.includes('Посевы')) return 'T4';
+
+  return null;
+}
+
+/**
+ * Настройка взаимодействия со схемой Mermaid
+ */
+function setupDiagramInteractivity() {
+  let zoomLevel = 1;
+  const viewport = document.getElementById('diagram-viewport');
+  
+  // Кнопки масштаба
+  document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
+    if (zoomLevel < 1.6) {
+      zoomLevel += 0.15;
+      viewport.style.transform = `scale(${zoomLevel})`;
+    }
+  });
+
+  document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
+    if (zoomLevel > 0.6) {
+      zoomLevel -= 0.15;
+      viewport.style.transform = `scale(${zoomLevel})`;
+    }
+  });
+
+  document.getElementById('btn-reset-zoom')?.addEventListener('click', () => {
+    zoomLevel = 1;
+    viewport.style.transform = `scale(1)`;
+  });
+
+  // Дожидаемся рендера Mermaid и привязываем события несколько раз для надежности
+  const attemptBind = () => {
+    bindMermaidNodeEvents();
+  };
+  setTimeout(attemptBind, 300);
+  setTimeout(attemptBind, 800);
+}
+
+/**
+ * Привязка событий наведения (hover) и клика к узлам Mermaid SVG
+ */
+function bindMermaidNodeEvents() {
+  const nodes = document.querySelectorAll('.mermaid .node, .mermaid .nodeGroup');
+  
+  nodes.forEach(node => {
+    const nodeId = extractNodeId(node);
+    
+    if (!nodeId || !funnelData[nodeId]) return;
+
+    node.style.cursor = 'pointer';
+
+    node.removeEventListener('mouseenter', node._hoverHandler);
+    node.removeEventListener('click', node._clickHandler);
+
+    node._hoverHandler = () => showNodeInspector(nodeId);
+    node._clickHandler = () => showNodeInspector(nodeId);
+
+    node.addEventListener('mouseenter', node._hoverHandler);
+    node.addEventListener('click', node._clickHandler);
+  });
+}
+
+
+/**
+ * Обновление инспектора данными узла
+ */
+function showNodeInspector(nodeId) {
+  const data = funnelData[nodeId];
+  if (!data) return;
+
+  const placeholder = document.getElementById('inspector-placeholder');
+  const content = document.getElementById('inspector-content');
+
+  placeholder?.classList.add('hidden');
+  content?.classList.remove('hidden');
+
+  document.getElementById('node-badge').textContent = data.badge;
+  document.getElementById('node-id-tag').textContent = `ID: ${nodeId}`;
+  document.getElementById('node-title').textContent = data.title;
+  document.getElementById('node-category').textContent = data.category;
+  document.getElementById('node-summary').textContent = data.summary;
+  document.getElementById('node-details').textContent = data.details;
+  document.getElementById('node-recommendation').textContent = data.recommendation;
+
+  const iconWrapper = document.getElementById('node-icon-wrapper');
+  const iconEl = document.getElementById('node-icon');
+
+  if (iconWrapper && iconEl) {
+    iconWrapper.style.backgroundColor = data.color;
+    iconEl.setAttribute('data-lucide', data.icon);
+    initIcons();
+  }
+}
+
+// Запуск приложения
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.mermaid) {
+    window.mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      securityLevel: 'loose',
+      flowchart: {
+        curve: 'basis', // Плавные изогнутые линии вместо резких углов
+        htmlLabels: true,
+        useMaxWidth: true
+      }
+    });
+  }
+  renderDashboard();
+});
