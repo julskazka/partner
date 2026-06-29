@@ -308,7 +308,7 @@ class I saleStyle;
 
         <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
           <span>Логика и структура воронки полностью сохранены</span>
-          <span class="font-mono text-indigo-400 font-bold bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20">v5.0 GIANT FONTS (3.2X Scale)</span>
+          <span class="font-mono text-indigo-400 font-bold bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20">v6.0 BALANCED SIZE (1.8X Scale)</span>
         </div>
       </section>
     </main>
@@ -434,27 +434,27 @@ function openNodeModal(nodeId) {
  * Настройка взаимодействия со схемой Mermaid
  */
 function setupDiagramInteractivity() {
-  let zoomLevel = 3.2; // 3.2X Громадный масштаб
+  let zoomLevel = 1.8; // 1.8X Аккуратный сбалансированный масштаб
   const viewport = document.getElementById('diagram-viewport');
   if (viewport) viewport.style.transform = `scale(${zoomLevel})`;
   
   document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
-    if (zoomLevel < 6.0) {
-      zoomLevel += 0.4;
+    if (zoomLevel < 4.0) {
+      zoomLevel += 0.3;
       viewport.style.transform = `scale(${zoomLevel})`;
     }
   });
 
   document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
-    if (zoomLevel > 1.0) {
-      zoomLevel -= 0.4;
+    if (zoomLevel > 0.8) {
+      zoomLevel -= 0.3;
       viewport.style.transform = `scale(${zoomLevel})`;
     }
   });
 
   document.getElementById('btn-reset-zoom')?.addEventListener('click', () => {
-    zoomLevel = 3.2;
-    viewport.style.transform = `scale(3.2)`;
+    zoomLevel = 1.8;
+    viewport.style.transform = `scale(1.8)`;
   });
 
   const attemptBind = () => {
@@ -467,13 +467,13 @@ function setupDiagramInteractivity() {
 }
 
 /**
- * Принудительное увеличение всех SVG надписей в DOM на 42px
+ * Корректировка всех SVG надписей в DOM на 25px
  */
 function enforceGiantSvgFonts() {
   const svgElements = document.querySelectorAll('.mermaid svg text, .mermaid svg tspan, .mermaid svg span');
   svgElements.forEach(el => {
-    el.style.fontSize = '42px';
-    el.style.fontWeight = '900';
+    el.style.fontSize = '25px';
+    el.style.fontWeight = '800';
   });
 }
 
@@ -542,9 +542,9 @@ document.addEventListener('DOMContentLoaded', () => {
       theme: 'dark',
       securityLevel: 'loose',
       themeVariables: {
-        fontSize: '42px',
+        fontSize: '25px',
         fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
-        nodePadding: '30px'
+        nodePadding: '20px'
       },
       flowchart: {
         curve: 'basis',
