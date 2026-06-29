@@ -528,10 +528,15 @@ document.addEventListener('DOMContentLoaded', () => {
       startOnLoad: true,
       theme: 'dark',
       securityLevel: 'loose',
+      themeVariables: {
+        fontSize: '28px',
+        fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+        nodePadding: '20px'
+      },
       flowchart: {
         curve: 'basis',
-        htmlLabels: true,
-        useMaxWidth: false // Позволяет делать схему крупной
+        htmlLabels: false, // Отключаем htmlLabels для 100% SVG масштабирования текста
+        useMaxWidth: false
       }
     });
   }

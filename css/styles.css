@@ -1,5 +1,5 @@
 /* ===========================================
-   styles.css — Modern SaaS Dashboard Theme (2X GIANT DIAGRAM)
+   styles.css — Modern SaaS Dashboard Theme (HUGE SVG DIAGRAM FONTS)
    =========================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap');
@@ -68,7 +68,7 @@ h1, h2, h3, h4, .font-heading {
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Mermaid Customization — 2X GIANT SCALE */
+/* Mermaid Customization — HUGE SVG SCALE & MASSIVE FONTS */
 .mermaid-wrapper {
   position: relative;
   width: 100%;
@@ -87,7 +87,7 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .mermaid svg {
-  min-width: 1600px !important;
+  min-width: 1500px !important;
   width: 100% !important;
   max-width: 2200px !important;
   height: auto !important;
@@ -96,7 +96,22 @@ h1, h2, h3, h4, .font-heading {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-/* Cluster Subgraph styling inside Mermaid SVG — 2X GIANT */
+/* UNIVERSAL SVG TEXT OVERRIDE — FORCES MASSIVE FONT SIZE FOR ALL DIAGRAM NODES */
+.mermaid svg text,
+.mermaid svg tspan,
+.mermaid svg .nodeLabel,
+.mermaid svg .node label,
+.mermaid svg g.label text,
+.mermaid svg foreignObject div,
+.mermaid svg foreignObject span {
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  dominant-baseline: middle !important;
+  text-anchor: middle !important;
+}
+
+/* Cluster Subgraph styling inside Mermaid SVG */
 .mermaid .cluster rect {
   fill: rgba(15, 23, 42, 0.65) !important;
   stroke: rgba(255, 255, 255, 0.25) !important;
@@ -107,16 +122,17 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .mermaid .cluster span.nodeLabel,
-.mermaid .cluster g.label text {
+.mermaid .cluster g.label text,
+.mermaid .cluster tspan {
   fill: #f1f5f9 !important;
   color: #f1f5f9 !important;
   font-weight: 900 !important;
-  font-size: 32px !important;
+  font-size: 28px !important;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-/* Smooth Curved Arrow Links — 2X THICK */
+/* Smooth Curved Arrow Links */
 .mermaid .edgePath .path {
   stroke: #94a3b8 !important;
   stroke-width: 8px !important;
@@ -135,7 +151,7 @@ h1, h2, h3, h4, .font-heading {
   transform: scale(2.2);
 }
 
-/* Custom Node Styles — 2X GIANT CARDS */
+/* Custom Node Styles */
 .mermaid .node rect, 
 .mermaid .node polygon, 
 .mermaid .node circle,
@@ -152,16 +168,6 @@ h1, h2, h3, h4, .font-heading {
   cursor: pointer;
 }
 
-/* Node Text Styling — 2X GIANT FONT (36px) */
-.mermaid .node span.nodeLabel,
-.mermaid .node g.label text,
-.mermaid .node div {
-  font-size: 36px !important;
-  font-weight: 900 !important;
-  line-height: 1.4 !important;
-  padding: 16px 32px !important;
-}
-
 /* Category Specific Node Styling */
 .traffic-style rect, .traffic-style polygon, .traffic-style div {
   fill: #064e3b !important;
@@ -169,7 +175,7 @@ h1, h2, h3, h4, .font-heading {
   stroke-width: 5px !important;
   filter: drop-shadow(0 12px 28px var(--cat-traffic-glow)) !important;
 }
-.traffic-style label, .traffic-style span, .traffic-style text {
+.traffic-style label, .traffic-style span, .traffic-style text, .traffic-style tspan {
   fill: #ecfdf5 !important;
   color: #ecfdf5 !important;
 }
@@ -180,7 +186,7 @@ h1, h2, h3, h4, .font-heading {
   stroke-width: 5px !important;
   filter: drop-shadow(0 12px 28px var(--cat-vk-glow)) !important;
 }
-.vk-style label, .vk-style span, .vk-style text {
+.vk-style label, .vk-style span, .vk-style text, .vk-style tspan {
   fill: #eff6ff !important;
   color: #eff6ff !important;
 }
@@ -191,7 +197,7 @@ h1, h2, h3, h4, .font-heading {
   stroke-width: 5px !important;
   filter: drop-shadow(0 12px 28px var(--cat-bot-glow)) !important;
 }
-.bot-style label, .bot-style span, .bot-style text {
+.bot-style label, .bot-style span, .bot-style text, .bot-style tspan {
   fill: #f5f3ff !important;
   color: #f5f3ff !important;
 }
@@ -202,7 +208,7 @@ h1, h2, h3, h4, .font-heading {
   stroke-width: 5px !important;
   filter: drop-shadow(0 12px 28px var(--cat-seg-glow)) !important;
 }
-.seg-style label, .seg-style span, .seg-style text {
+.seg-style label, .seg-style span, .seg-style text, .seg-style tspan {
   fill: #fffbeb !important;
   color: #fffbeb !important;
 }
@@ -214,7 +220,7 @@ h1, h2, h3, h4, .font-heading {
   filter: drop-shadow(0 12px 36px var(--cat-sale-glow)) !important;
   animation: pulseGlow 2.5s infinite alternate ease-in-out;
 }
-.sale-style label, .sale-style span, .sale-style text {
+.sale-style label, .sale-style span, .sale-style text, .sale-style tspan {
   fill: #fff1f2 !important;
   color: #fff1f2 !important;
 }
