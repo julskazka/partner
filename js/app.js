@@ -306,7 +306,7 @@ class I saleStyle;
         <!-- Footer status -->
         <div class="shrink-0 pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
           <span>Логика 100% сохранена</span>
-          <span class="font-mono text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">v7.0 1-PAGE PERFECT FIT</span>
+          <span class="font-mono text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">v8.0 STABLE COMPACT (1.0X Scale)</span>
         </div>
       </section>
     </main>
@@ -420,7 +420,7 @@ function openNodeModal(nodeId) {
 }
 
 function setupDiagramInteractivity() {
-  let zoomLevel = 1.0; // Точный аккуратный масштаб для 1 страницы
+  let zoomLevel = 1.0;
   const viewport = document.getElementById('diagram-viewport');
   if (viewport) viewport.style.transform = `scale(${zoomLevel})`;
   
@@ -454,8 +454,8 @@ function setupDiagramInteractivity() {
 function enforceGiantSvgFonts() {
   const svgElements = document.querySelectorAll('.mermaid svg text, .mermaid svg tspan, .mermaid svg span');
   svgElements.forEach(el => {
-    el.style.fontSize = '19px';
-    el.style.fontWeight = '800';
+    el.style.fontSize = '16px';
+    el.style.fontWeight = '700';
   });
 }
 
@@ -517,9 +517,9 @@ document.addEventListener('DOMContentLoaded', () => {
       theme: 'dark',
       securityLevel: 'loose',
       themeVariables: {
-        fontSize: '19px',
+        fontSize: '16px',
         fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
-        nodePadding: '14px'
+        nodePadding: '12px'
       },
       flowchart: {
         curve: 'basis',
