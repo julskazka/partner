@@ -1,7 +1,7 @@
 // js/app.js
 import { initIcons } from './utils.js';
 
-// Данные для каждого узла воронки (Hover-инфо, подсказки и аналитика)
+// Данные для каждого узла воронки (Подробная информация в модальном окне)
 const funnelData = {
   'T1': {
     title: 'Таргетированная реклама',
@@ -156,15 +156,15 @@ const funnelData = {
 };
 
 /**
- * Инициализация UI Дашборда
+ * Рендер главного интерфейса на всю ширину с модальным окном
  */
 function renderDashboard() {
   const appEl = document.getElementById('app');
   
   appEl.innerHTML = `
     <!-- Top Bar Navigation -->
-    <header class="border-b border-white/10 bg-[#0d1322]/80 backdrop-blur-md sticky top-0 z-40">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header class="border-b border-white/10 bg-[#0d1322]/90 backdrop-blur-md sticky top-0 z-40">
+      <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-vk-blue p-0.5 flex items-center justify-center shadow-lg shadow-indigo-500/20">
             <div class="w-full h-full bg-[#090d16] rounded-[10px] flex items-center justify-center">
@@ -173,75 +173,74 @@ function renderDashboard() {
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h1 class="text-base sm:text-lg font-bold tracking-tight text-white font-heading">VK-ВОРОНКА</h1>
-              <span class="px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">Interactive SaaS Map</span>
+              <h1 class="text-base sm:text-xl font-extrabold tracking-tight text-white font-heading">VK-ВОРОНКА</h1>
+              <span class="px-2.5 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">Interactive Fullscreen Map</span>
             </div>
-            <p class="text-xs text-slate-400 hidden sm:block">Архитектура интерактивной карты конверсии • Notibot Ecosystem</p>
+            <p class="text-xs text-slate-400 hidden sm:block">Интерактивная карта воронки конверсии • Нажмите на любой блок для детальной информации</p>
           </div>
         </div>
 
         <!-- Toolbar Buttons -->
         <div class="flex items-center gap-2">
-          <button id="btn-zoom-in" title="Увеличить" class="btn-press p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
-            <i data-lucide="zoom-in" class="w-4 h-4"></i>
+          <button id="btn-zoom-in" title="Увеличить" class="btn-press p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
+            <i data-lucide="zoom-in" class="w-5 h-5"></i>
           </button>
-          <button id="btn-zoom-out" title="Уменьшить" class="btn-press p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
-            <i data-lucide="zoom-out" class="w-4 h-4"></i>
+          <button id="btn-zoom-out" title="Уменьшить" class="btn-press p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
+            <i data-lucide="zoom-out" class="w-5 h-5"></i>
           </button>
-          <button id="btn-reset-zoom" title="Сбросить масштаб" class="btn-press px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5">
-            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-            <span class="hidden md:inline">Сброс</span>
+          <button id="btn-reset-zoom" title="Сбросить масштаб" class="btn-press px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition flex items-center gap-2">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            <span>Сбросить масштаб</span>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- Main Content Grid -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <!-- Legend / Filter Pills Bar -->
-      <div class="mb-6 flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl glass-card">
+    <!-- Main Content Fullwidth Container -->
+    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      
+      <!-- Legend Bar -->
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl glass-card">
         <div class="flex items-center gap-2">
-          <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i>
-          <span class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Категории:</span>
+          <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
+          <span class="text-xs font-bold uppercase text-slate-300 tracking-wider">Легенда схемы:</span>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Трафик
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> Источники Трафика
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-            <span class="w-2 h-2 rounded-full bg-blue-400"></span> VK Оболочка
+          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> VK Входная Оболочка
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
-            <span class="w-2 h-2 rounded-full bg-purple-400"></span> Бот / Ядро
+          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span> Чат-бот & Ядро
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Сегментация
+          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Сегментация & Прогрев
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-sm shadow-rose-500/20">
-            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> Продажи
+          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-sm shadow-rose-500/20">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span> Финальные Продажи
           </span>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <!-- Large Diagram Canvas -->
+      <section class="glass-card rounded-3xl p-6 sm:p-10 relative overflow-hidden min-h-[750px] flex flex-col justify-between border border-white/10 shadow-2xl">
         
-        <!-- Interactive Diagram Workspace (Cols 8) -->
-        <section class="lg:col-span-8 glass-card rounded-2xl p-4 sm:p-6 relative overflow-hidden min-h-[600px] flex flex-col justify-between">
-          
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <h2 class="text-sm font-semibold text-slate-200 font-heading">Интерактивная Схема Воронки</h2>
-            </div>
-            <span class="text-xs text-slate-400 flex items-center gap-1">
-              <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5 text-indigo-400"></i>
-              Наведите или кликните на узел
-            </span>
+        <div class="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
+          <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+            <h2 class="text-base font-bold text-slate-100 font-heading">Карта Воронки Конверсии (Крупный вид)</h2>
           </div>
+          <div class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-300 text-xs font-medium flex items-center gap-2">
+            <i data-lucide="pointer" class="w-4 h-4 animate-bounce text-indigo-400"></i>
+            <span>Нажмите на любой узел для просмотра информации</span>
+          </div>
+        </div>
 
-          <!-- Mermaid Render Container -->
-          <div id="diagram-viewport" class="mermaid-wrapper flex-1 flex items-center justify-center transition-transform duration-200 origin-center">
-            <div class="mermaid">
+        <!-- Mermaid Render Viewport -->
+        <div id="diagram-viewport" class="mermaid-wrapper flex-1 flex items-center justify-center transition-transform duration-300 origin-center py-8">
+          <div class="mermaid">
 flowchart TD
 
 subgraph T[Источники трафика]
@@ -293,103 +292,185 @@ G2 --> H
 
 H --> I
 
-classDef trafficStyle fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#fff;
-classDef vkStyle fill:#1e3a8a,stroke:#0077ff,stroke-width:2px,color:#fff;
-classDef botStyle fill:#4c1d95,stroke:#8b5cf6,stroke-width:2px,color:#fff;
-classDef segStyle fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#fff;
-classDef saleStyle fill:#831843,stroke:#ef4444,stroke-width:2.5px,color:#fff;
+classDef trafficStyle fill:#064e3b,stroke:#10b981,stroke-width:2.5px,color:#fff;
+classDef vkStyle fill:#1e3a8a,stroke:#0077ff,stroke-width:2.5px,color:#fff;
+classDef botStyle fill:#4c1d95,stroke:#8b5cf6,stroke-width:2.5px,color:#fff;
+classDef segStyle fill:#78350f,stroke:#f59e0b,stroke-width:2.5px,color:#fff;
+classDef saleStyle fill:#831843,stroke:#ef4444,stroke-width:3px,color:#fff;
 
 class T1,T2,T3,T4,A trafficStyle;
 class B,VK vkStyle;
 class E,F,BOT botStyle;
 class C,D1,D2,G1,G2,H segStyle;
 class I saleStyle;
-            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+          <span>Логика и структура воронки полностью сохранены</span>
+          <span class="font-mono text-slate-500">100% Flowchart Compatibility</span>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal Dialog Popup (Show information on node click) -->
+    <div id="node-modal-backdrop" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+      <div id="node-modal-card" class="glass-card bg-[#0f172a]/95 border border-white/15 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl transform scale-95 transition-transform duration-300 relative text-left">
+        
+        <!-- Close Button -->
+        <button id="modal-close-btn" class="absolute top-5 right-5 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Header info -->
+        <div class="flex items-center justify-between mb-4 pr-8">
+          <span id="modal-badge" class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            Категория
+          </span>
+          <span id="modal-id-tag" class="text-xs font-mono text-slate-400 font-bold bg-white/5 px-2 py-1 rounded-md">NODE_ID</span>
+        </div>
+
+        <div class="flex items-start gap-4 mb-6">
+          <div id="modal-icon-wrapper" class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 text-white shadow-xl shadow-black/40">
+            <i id="modal-icon" data-lucide="info" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 id="modal-title" class="text-xl sm:text-2xl font-extrabold text-white font-heading leading-tight">Название блока</h3>
+            <p id="modal-category" class="text-xs font-medium text-slate-400 mt-0.5">Подкатегория</p>
+          </div>
+        </div>
+
+        <!-- Body Details -->
+        <div class="space-y-4 text-xs sm:text-sm">
+          <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Краткая суть:</span>
+            <p id="modal-summary" class="text-slate-200 leading-relaxed font-normal">Пояснение блока</p>
           </div>
 
-          <!-- Bottom status info bar -->
-          <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
-            <div class="flex items-center gap-2">
-              <i data-lucide="shield-check" class="w-4 h-4 text-indigo-400"></i>
-              <span>Структура и логика связей 100% сохранены</span>
-            </div>
-            <span class="text-[11px] bg-white/5 px-2 py-0.5 rounded text-slate-400">v2.4 SaaS UI</span>
+          <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
+            <span class="text-[11px] font-bold text-indigo-300 uppercase tracking-wider block mb-1">Детали и UX-роль:</span>
+            <p id="modal-details" class="text-slate-300 leading-relaxed">Подробная информация о работе данного узла воронки.</p>
           </div>
-        </section>
 
-        <!-- Dynamic Inspector / Hover Panel (Cols 4) -->
-        <aside class="lg:col-span-4 glass-card rounded-2xl p-6 sticky top-24">
-          <div id="inspector-panel" class="transition-all duration-300">
-            <!-- Default Placeholder -->
-            <div id="inspector-placeholder" class="text-center py-12 px-4">
-              <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-4 text-indigo-400">
-                <i data-lucide="sparkles" class="w-8 h-8 animate-bounce"></i>
-              </div>
-              <h3 class="text-base font-bold text-white mb-2 font-heading">Выберите этап воронки</h3>
-              <p class="text-xs text-slate-400 leading-relaxed">
-                Наведите курсор или нажмите на любой блок на схеме, чтобы изучить подробные инструкции, рекомендации и UX-пояснения по данному шагу.
-              </p>
+          <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-200">
+            <div class="flex items-center gap-2 font-bold text-emerald-400 mb-1">
+              <i data-lucide="lightbulb" class="w-4 h-4"></i>
+              <span>Рекомендация эксперта:</span>
             </div>
-
-            <!-- Active Inspector Card (Hidden by default) -->
-            <div id="inspector-content" class="hidden animate-slide-in">
-              <div class="flex items-center justify-between mb-4">
-                <span id="node-badge" class="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  Категория
-                </span>
-                <span id="node-id-tag" class="text-xs font-mono text-slate-500 font-bold">NODE_ID</span>
-              </div>
-
-              <div class="flex items-start gap-3 mb-4">
-                <div id="node-icon-wrapper" class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-lg">
-                  <i id="node-icon" data-lucide="info" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h3 id="node-title" class="text-lg font-bold text-white font-heading leading-snug">Название блока</h3>
-                  <p id="node-category" class="text-xs text-slate-400 font-medium">Подкатегория</p>
-                </div>
-              </div>
-
-              <div class="space-y-4 text-xs">
-                <div class="p-3.5 rounded-xl bg-white/5 border border-white/5">
-                  <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Краткая суть:</span>
-                  <p id="node-summary" class="text-slate-200 leading-relaxed font-normal">Пояснение блока</p>
-                </div>
-
-                <div class="p-3.5 rounded-xl bg-white/5 border border-white/5">
-                  <span class="text-[11px] font-semibold text-indigo-300 uppercase tracking-wider block mb-1.5">Детали и UX-роль:</span>
-                  <p id="node-details" class="text-slate-300 leading-relaxed">Подробная информация о работе данного узла воронки.</p>
-                </div>
-
-                <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-200">
-                  <div class="flex items-center gap-1.5 font-semibold text-emerald-400 mb-1">
-                    <i data-lucide="lightbulb" class="w-4 h-4"></i>
-                    <span>Рекомендация эксперта:</span>
-                  </div>
-                  <p id="node-recommendation" class="leading-relaxed">Практический совет по настройке конверсии.</p>
-                </div>
-              </div>
-            </div>
-
+            <p id="modal-recommendation" class="leading-relaxed">Практический совет по настройке конверсии.</p>
           </div>
-        </aside>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-white/10 flex justify-end">
+          <button id="modal-ok-btn" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition">
+            Понятно
+          </button>
+        </div>
 
       </div>
-    </main>
+    </div>
   `;
 
   initIcons();
   setupDiagramInteractivity();
+  setupModalEvents();
 }
 
 /**
- * Извлечение оригинального ID узла (например 'T1', 'A', 'B') из DOM элемента Mermaid
+ * Настройка событий модального окна
+ */
+function setupModalEvents() {
+  const backdrop = document.getElementById('node-modal-backdrop');
+  const closeBtn = document.getElementById('modal-close-btn');
+  const okBtn = document.getElementById('modal-ok-btn');
+
+  const closeModal = () => {
+    backdrop?.classList.add('opacity-0', 'pointer-events-none');
+    document.getElementById('node-modal-card')?.classList.add('scale-95');
+  };
+
+  closeBtn?.addEventListener('click', closeModal);
+  okBtn?.addEventListener('click', closeModal);
+
+  backdrop?.addEventListener('click', (e) => {
+    if (e.target === backdrop) {
+      closeModal();
+    }
+  });
+}
+
+/**
+ * Открытие модального окна с данными узла при клике
+ */
+function openNodeModal(nodeId) {
+  const data = funnelData[nodeId];
+  if (!data) return;
+
+  const backdrop = document.getElementById('node-modal-backdrop');
+  const card = document.getElementById('node-modal-card');
+
+  document.getElementById('modal-badge').textContent = data.badge;
+  document.getElementById('modal-id-tag').textContent = `Узел: ${nodeId}`;
+  document.getElementById('modal-title').textContent = data.title;
+  document.getElementById('modal-category').textContent = data.category;
+  document.getElementById('modal-summary').textContent = data.summary;
+  document.getElementById('modal-details').textContent = data.details;
+  document.getElementById('modal-recommendation').textContent = data.recommendation;
+
+  const iconWrapper = document.getElementById('modal-icon-wrapper');
+  const iconEl = document.getElementById('modal-icon');
+
+  if (iconWrapper && iconEl) {
+    iconWrapper.style.backgroundColor = data.color;
+    iconEl.setAttribute('data-lucide', data.icon);
+    initIcons();
+  }
+
+  backdrop?.classList.remove('opacity-0', 'pointer-events-none');
+  card?.classList.remove('scale-95');
+}
+
+/**
+ * Настройка взаимодействия со схемой Mermaid
+ */
+function setupDiagramInteractivity() {
+  let zoomLevel = 1.15; // По умолчанию крупнее
+  const viewport = document.getElementById('diagram-viewport');
+  if (viewport) viewport.style.transform = `scale(${zoomLevel})`;
+  
+  document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
+    if (zoomLevel < 2.2) {
+      zoomLevel += 0.2;
+      viewport.style.transform = `scale(${zoomLevel})`;
+    }
+  });
+
+  document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
+    if (zoomLevel > 0.7) {
+      zoomLevel -= 0.2;
+      viewport.style.transform = `scale(${zoomLevel})`;
+    }
+  });
+
+  document.getElementById('btn-reset-zoom')?.addEventListener('click', () => {
+    zoomLevel = 1.15;
+    viewport.style.transform = `scale(1.15)`;
+  });
+
+  const attemptBind = () => {
+    bindMermaidNodeEvents();
+  };
+  setTimeout(attemptBind, 300);
+  setTimeout(attemptBind, 800);
+}
+
+/**
+ * Извлечение оригинального ID узлаиз DOM элемента Mermaid
  */
 function extractNodeId(nodeEl) {
   const fullId = nodeEl.id || '';
   const textContent = nodeEl.textContent ? nodeEl.textContent.trim() : '';
 
-  // 1. Проверяем точное вхождение ключа в id элементов (например flowchart-T1-10)
   for (const key of Object.keys(funnelData)) {
     const parts = fullId.split('-');
     if (parts.includes(key)) {
@@ -397,14 +478,12 @@ function extractNodeId(nodeEl) {
     }
   }
 
-  // 2. Проверяем по совпадению текста в блоке
   for (const [key, item] of Object.entries(funnelData)) {
     if (textContent.includes(item.title) || textContent.includes(key)) {
       return key;
     }
   }
 
-  // 3. Запасной сопоставитель по уникальным словам
   if (textContent.includes('Трафик') && !textContent.includes('Источники')) return 'A';
   if (textContent.includes('оболочка')) return 'B';
   if (textContent.includes('Вход')) return 'C';
@@ -425,94 +504,21 @@ function extractNodeId(nodeEl) {
 }
 
 /**
- * Настройка взаимодействия со схемой Mermaid
- */
-function setupDiagramInteractivity() {
-  let zoomLevel = 1;
-  const viewport = document.getElementById('diagram-viewport');
-  
-  // Кнопки масштаба
-  document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
-    if (zoomLevel < 1.6) {
-      zoomLevel += 0.15;
-      viewport.style.transform = `scale(${zoomLevel})`;
-    }
-  });
-
-  document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
-    if (zoomLevel > 0.6) {
-      zoomLevel -= 0.15;
-      viewport.style.transform = `scale(${zoomLevel})`;
-    }
-  });
-
-  document.getElementById('btn-reset-zoom')?.addEventListener('click', () => {
-    zoomLevel = 1;
-    viewport.style.transform = `scale(1)`;
-  });
-
-  // Дожидаемся рендера Mermaid и привязываем события несколько раз для надежности
-  const attemptBind = () => {
-    bindMermaidNodeEvents();
-  };
-  setTimeout(attemptBind, 300);
-  setTimeout(attemptBind, 800);
-}
-
-/**
- * Привязка событий наведения (hover) и клика к узлам Mermaid SVG
+ * Привязка событий клика к узлам Mermaid SVG (Вызов модального окна)
  */
 function bindMermaidNodeEvents() {
   const nodes = document.querySelectorAll('.mermaid .node, .mermaid .nodeGroup');
   
   nodes.forEach(node => {
     const nodeId = extractNodeId(node);
-    
     if (!nodeId || !funnelData[nodeId]) return;
 
     node.style.cursor = 'pointer';
 
-    node.removeEventListener('mouseenter', node._hoverHandler);
     node.removeEventListener('click', node._clickHandler);
-
-    node._hoverHandler = () => showNodeInspector(nodeId);
-    node._clickHandler = () => showNodeInspector(nodeId);
-
-    node.addEventListener('mouseenter', node._hoverHandler);
+    node._clickHandler = () => openNodeModal(nodeId);
     node.addEventListener('click', node._clickHandler);
   });
-}
-
-
-/**
- * Обновление инспектора данными узла
- */
-function showNodeInspector(nodeId) {
-  const data = funnelData[nodeId];
-  if (!data) return;
-
-  const placeholder = document.getElementById('inspector-placeholder');
-  const content = document.getElementById('inspector-content');
-
-  placeholder?.classList.add('hidden');
-  content?.classList.remove('hidden');
-
-  document.getElementById('node-badge').textContent = data.badge;
-  document.getElementById('node-id-tag').textContent = `ID: ${nodeId}`;
-  document.getElementById('node-title').textContent = data.title;
-  document.getElementById('node-category').textContent = data.category;
-  document.getElementById('node-summary').textContent = data.summary;
-  document.getElementById('node-details').textContent = data.details;
-  document.getElementById('node-recommendation').textContent = data.recommendation;
-
-  const iconWrapper = document.getElementById('node-icon-wrapper');
-  const iconEl = document.getElementById('node-icon');
-
-  if (iconWrapper && iconEl) {
-    iconWrapper.style.backgroundColor = data.color;
-    iconEl.setAttribute('data-lucide', data.icon);
-    initIcons();
-  }
 }
 
 // Запуск приложения
@@ -523,9 +529,9 @@ document.addEventListener('DOMContentLoaded', () => {
       theme: 'dark',
       securityLevel: 'loose',
       flowchart: {
-        curve: 'basis', // Плавные изогнутые линии вместо резких углов
+        curve: 'basis',
         htmlLabels: true,
-        useMaxWidth: true
+        useMaxWidth: false // Позволяет делать схему крупной
       }
     });
   }
