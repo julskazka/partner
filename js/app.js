@@ -1,7 +1,7 @@
 // js/app.js
 import { initIcons } from './utils.js';
 
-// Данные для каждого узла воронки (Подробная информация в модальном окне)
+// Данные для каждого узла воронки (Информация в всплывающем модальном окне)
 const funnelData = {
   'T1': {
     title: 'Таргетированная реклама',
@@ -156,90 +156,87 @@ const funnelData = {
 };
 
 /**
- * Рендер главного интерфейса на всю ширину с модальным окном
+ * Рендер 1-страничного веб-приложения без скролла
  */
 function renderDashboard() {
   const appEl = document.getElementById('app');
   
   appEl.innerHTML = `
-    <!-- Top Bar Navigation -->
-    <header class="border-b border-white/10 bg-[#0d1322]/90 backdrop-blur-md sticky top-0 z-40">
-      <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <!-- Compact Top Bar Header -->
+    <header class="border-b border-white/10 bg-[#0d1322]/90 backdrop-blur-md shrink-0">
+      <div class="max-w-[1600px] mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-vk-blue p-0.5 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <div class="w-full h-full bg-[#090d16] rounded-[10px] flex items-center justify-center">
-              <i data-lucide="workflow" class="w-5 h-5 text-indigo-400"></i>
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-vk-blue p-0.5 flex items-center justify-center shadow-md">
+            <div class="w-full h-full bg-[#090d16] rounded-[6px] flex items-center justify-center">
+              <i data-lucide="workflow" class="w-4 h-4 text-indigo-400"></i>
             </div>
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h1 class="text-base sm:text-xl font-extrabold tracking-tight text-white font-heading">VK-ВОРОНКА</h1>
-              <span class="px-2.5 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">Interactive Fullscreen Map</span>
-            </div>
-            <p class="text-xs text-slate-400 hidden sm:block">Интерактивная карта воронки конверсии • Нажмите на любой блок для детальной информации</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-white font-heading">VK-ВОРОНКА</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">1-Page Fit View</span>
           </div>
         </div>
 
         <!-- Toolbar Buttons -->
-        <div class="flex items-center gap-2">
-          <button id="btn-zoom-in" title="Увеличить" class="btn-press p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
-            <i data-lucide="zoom-in" class="w-5 h-5"></i>
+        <div class="flex items-center gap-1.5">
+          <button id="btn-zoom-in" title="Увеличить" class="btn-press p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
+            <i data-lucide="zoom-in" class="w-4 h-4"></i>
           </button>
-          <button id="btn-zoom-out" title="Уменьшить" class="btn-press p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
-            <i data-lucide="zoom-out" class="w-5 h-5"></i>
+          <button id="btn-zoom-out" title="Уменьшить" class="btn-press p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition">
+            <i data-lucide="zoom-out" class="w-4 h-4"></i>
           </button>
-          <button id="btn-reset-zoom" title="Сбросить масштаб" class="btn-press px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition flex items-center gap-2">
-            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-            <span>Сбросить масштаб</span>
+          <button id="btn-reset-zoom" title="Сбросить масштаб" class="btn-press px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>Сброс</span>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- Main Content Fullwidth Container -->
-    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Main Content Container (Exactly fits 1 Screen) -->
+    <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 py-3 flex flex-col overflow-hidden gap-3">
       
-      <!-- Legend Bar -->
-      <div class="mb-6 flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl glass-card">
-        <div class="flex items-center gap-2">
-          <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
-          <span class="text-xs font-bold uppercase text-slate-300 tracking-wider">Легенда схемы:</span>
+      <!-- Compact Legend Bar -->
+      <div class="shrink-0 flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl glass-card">
+        <div class="flex items-center gap-1.5 text-xs font-bold uppercase text-slate-300 tracking-wider">
+          <i data-lucide="layers" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>Легенда:</span>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
-          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> Источники Трафика
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Трафик
           </span>
-          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> VK Входная Оболочка
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-blue-400"></span> VK Оболочка
           </span>
-          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
-            <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span> Чат-бот & Ядро
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-purple-400"></span> Бот / Ядро
           </span>
-          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Сегментация & Прогрев
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Сегментация
           </span>
-          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-sm shadow-rose-500/20">
-            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span> Финальные Продажи
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/30 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span> Продажи
           </span>
         </div>
       </div>
 
-      <!-- Large Diagram Canvas -->
-      <section class="glass-card rounded-3xl p-6 sm:p-10 relative overflow-hidden min-h-[750px] flex flex-col justify-between border border-white/10 shadow-2xl">
+      <!-- Diagram Card (Flexible height, fits available space) -->
+      <section class="flex-1 glass-card rounded-2xl p-4 relative overflow-hidden flex flex-col justify-between border border-white/10 min-h-0">
         
-        <div class="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
-          <div class="flex items-center gap-3">
-            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
-            <h2 class="text-base font-bold text-slate-100 font-heading">Карта Воронки Конверсии (Крупный вид)</h2>
+        <div class="shrink-0 flex items-center justify-between mb-2 pb-2 border-b border-white/10">
+          <div class="flex items-center gap-2 text-xs font-bold text-slate-200 font-heading">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Интерактивная Схема Воронки</span>
           </div>
-          <div class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-300 text-xs font-medium flex items-center gap-2">
-            <i data-lucide="pointer" class="w-4 h-4 animate-bounce text-indigo-400"></i>
-            <span>Нажмите на любой узел для просмотра информации</span>
-          </div>
+          <span class="text-[11px] text-slate-400 flex items-center gap-1">
+            <i data-lucide="pointer" class="w-3 h-3 text-indigo-400"></i>
+            Нажмите на блок для подробностей
+          </span>
         </div>
 
-        <!-- Mermaid Render Viewport -->
-        <div id="diagram-viewport" class="mermaid-wrapper flex-1 flex items-center justify-center transition-transform duration-300 origin-center py-8">
+        <!-- Mermaid Viewport Container -->
+        <div id="diagram-viewport" class="mermaid-wrapper flex-1 overflow-hidden transition-transform duration-200">
           <div class="mermaid">
 flowchart TD
 
@@ -306,64 +303,62 @@ class I saleStyle;
           </div>
         </div>
 
-        <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-          <span>Логика и структура воронки полностью сохранены</span>
-          <span class="font-mono text-indigo-400 font-bold bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20">v6.0 BALANCED SIZE (1.8X Scale)</span>
+        <!-- Footer status -->
+        <div class="shrink-0 pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+          <span>Логика 100% сохранена</span>
+          <span class="font-mono text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">v7.0 1-PAGE PERFECT FIT</span>
         </div>
       </section>
     </main>
 
-    <!-- Modal Dialog Popup (Show information on node click) -->
-    <div id="node-modal-backdrop" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-      <div id="node-modal-card" class="glass-card bg-[#0f172a]/95 border border-white/15 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl transform scale-95 transition-transform duration-300 relative text-left">
+    <!-- Modal Dialog Popup -->
+    <div id="node-modal-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+      <div id="node-modal-card" class="glass-card bg-[#0f172a]/95 border border-white/15 rounded-2xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-300 relative text-left">
         
-        <!-- Close Button -->
-        <button id="modal-close-btn" class="absolute top-5 right-5 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button id="modal-close-btn" class="absolute top-4 right-4 p-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
 
-        <!-- Header info -->
-        <div class="flex items-center justify-between mb-4 pr-8">
-          <span id="modal-badge" class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+        <div class="flex items-center justify-between mb-3 pr-6">
+          <span id="modal-badge" class="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
             Категория
           </span>
-          <span id="modal-id-tag" class="text-xs font-mono text-slate-400 font-bold bg-white/5 px-2 py-1 rounded-md">NODE_ID</span>
+          <span id="modal-id-tag" class="text-[11px] font-mono text-slate-400 font-bold bg-white/5 px-2 py-0.5 rounded">NODE_ID</span>
         </div>
 
-        <div class="flex items-start gap-4 mb-6">
-          <div id="modal-icon-wrapper" class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 text-white shadow-xl shadow-black/40">
-            <i id="modal-icon" data-lucide="info" class="w-6 h-6"></i>
+        <div class="flex items-start gap-3 mb-4">
+          <div id="modal-icon-wrapper" class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-white shadow-lg">
+            <i id="modal-icon" data-lucide="info" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 id="modal-title" class="text-xl sm:text-2xl font-extrabold text-white font-heading leading-tight">Название блока</h3>
+            <h3 id="modal-title" class="text-lg font-bold text-white font-heading leading-tight">Название блока</h3>
             <p id="modal-category" class="text-xs font-medium text-slate-400 mt-0.5">Подкатегория</p>
           </div>
         </div>
 
-        <!-- Body Details -->
-        <div class="space-y-4 text-xs sm:text-sm">
-          <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Краткая суть:</span>
+        <div class="space-y-3 text-xs">
+          <div class="p-3 rounded-xl bg-white/5 border border-white/5">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Краткая суть:</span>
             <p id="modal-summary" class="text-slate-200 leading-relaxed font-normal">Пояснение блока</p>
           </div>
 
-          <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
-            <span class="text-[11px] font-bold text-indigo-300 uppercase tracking-wider block mb-1">Детали и UX-роль:</span>
+          <div class="p-3 rounded-xl bg-white/5 border border-white/5">
+            <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider block mb-1">Детали и UX-роль:</span>
             <p id="modal-details" class="text-slate-300 leading-relaxed">Подробная информация о работе данного узла воронки.</p>
           </div>
 
-          <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-200">
-            <div class="flex items-center gap-2 font-bold text-emerald-400 mb-1">
-              <i data-lucide="lightbulb" class="w-4 h-4"></i>
-              <span>Рекомендация эксперта:</span>
+          <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-200">
+            <div class="flex items-center gap-1.5 font-bold text-emerald-400 mb-0.5">
+              <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i>
+              <span>Рекомендация:</span>
             </div>
             <p id="modal-recommendation" class="leading-relaxed">Практический совет по настройке конверсии.</p>
           </div>
         </div>
 
-        <div class="mt-6 pt-4 border-t border-white/10 flex justify-end">
-          <button id="modal-ok-btn" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition">
-            Понятно
+        <div class="mt-4 pt-3 border-t border-white/10 flex justify-end">
+          <button id="modal-ok-btn" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow-md transition">
+            Закрыть
           </button>
         </div>
 
@@ -376,9 +371,6 @@ class I saleStyle;
   setupModalEvents();
 }
 
-/**
- * Настройка событий модального окна
- */
 function setupModalEvents() {
   const backdrop = document.getElementById('node-modal-backdrop');
   const closeBtn = document.getElementById('modal-close-btn');
@@ -399,9 +391,6 @@ function setupModalEvents() {
   });
 }
 
-/**
- * Открытие модального окна с данными узла при клике
- */
 function openNodeModal(nodeId) {
   const data = funnelData[nodeId];
   if (!data) return;
@@ -430,56 +419,46 @@ function openNodeModal(nodeId) {
   card?.classList.remove('scale-95');
 }
 
-/**
- * Настройка взаимодействия со схемой Mermaid
- */
 function setupDiagramInteractivity() {
-  let zoomLevel = 1.8; // 1.8X Аккуратный сбалансированный масштаб
+  let zoomLevel = 1.0; // Точный аккуратный масштаб для 1 страницы
   const viewport = document.getElementById('diagram-viewport');
   if (viewport) viewport.style.transform = `scale(${zoomLevel})`;
   
   document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
-    if (zoomLevel < 4.0) {
-      zoomLevel += 0.3;
+    if (zoomLevel < 2.5) {
+      zoomLevel += 0.2;
       viewport.style.transform = `scale(${zoomLevel})`;
     }
   });
 
   document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
-    if (zoomLevel > 0.8) {
-      zoomLevel -= 0.3;
+    if (zoomLevel > 0.5) {
+      zoomLevel -= 0.2;
       viewport.style.transform = `scale(${zoomLevel})`;
     }
   });
 
   document.getElementById('btn-reset-zoom')?.addEventListener('click', () => {
-    zoomLevel = 1.8;
-    viewport.style.transform = `scale(1.8)`;
+    zoomLevel = 1.0;
+    viewport.style.transform = `scale(1.0)`;
   });
 
   const attemptBind = () => {
     bindMermaidNodeEvents();
     enforceGiantSvgFonts();
   };
-  setTimeout(attemptBind, 300);
-  setTimeout(attemptBind, 800);
-  setTimeout(attemptBind, 1500);
+  setTimeout(attemptBind, 250);
+  setTimeout(attemptBind, 600);
 }
 
-/**
- * Корректировка всех SVG надписей в DOM на 25px
- */
 function enforceGiantSvgFonts() {
   const svgElements = document.querySelectorAll('.mermaid svg text, .mermaid svg tspan, .mermaid svg span');
   svgElements.forEach(el => {
-    el.style.fontSize = '25px';
+    el.style.fontSize = '19px';
     el.style.fontWeight = '800';
   });
 }
 
-/**
- * Извлечение оригинального ID узлаиз DOM элемента Mermaid
- */
 function extractNodeId(nodeEl) {
   const fullId = nodeEl.id || '';
   const textContent = nodeEl.textContent ? nodeEl.textContent.trim() : '';
@@ -516,9 +495,6 @@ function extractNodeId(nodeEl) {
   return null;
 }
 
-/**
- * Привязка событий клика к узлам Mermaid SVG (Вызов модального окна)
- */
 function bindMermaidNodeEvents() {
   const nodes = document.querySelectorAll('.mermaid .node, .mermaid .nodeGroup');
   
@@ -534,7 +510,6 @@ function bindMermaidNodeEvents() {
   });
 }
 
-// Запуск приложения
 document.addEventListener('DOMContentLoaded', () => {
   if (window.mermaid) {
     window.mermaid.initialize({
@@ -542,14 +517,14 @@ document.addEventListener('DOMContentLoaded', () => {
       theme: 'dark',
       securityLevel: 'loose',
       themeVariables: {
-        fontSize: '25px',
+        fontSize: '19px',
         fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
-        nodePadding: '20px'
+        nodePadding: '14px'
       },
       flowchart: {
         curve: 'basis',
         htmlLabels: false,
-        useMaxWidth: false
+        useMaxWidth: true
       }
     });
   }
