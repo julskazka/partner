@@ -3,32 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Партнёрский Симулятор Дохода 3.0</title>
+  <title>Партнёрский Симулятор Дохода 4.0</title>
 
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-  <!-- Стили проекта (Self-contained) -->
-  <link rel="stylesheet" href="./css/styles.css" />
-
-  <!--
-    💡 Notibot Bridge подключается здесь если нужна интеграция с Notibot.
-    Используй скилл "Notibot Bridge" — агент добавит строку ниже:
-    <script src="./js/notibot-bridge.js"></script>
-  -->
+  <!-- Стили проекта (Self-contained + Cache buster) -->
+  <link rel="stylesheet" href="./css/styles.css?v=4.0" />
 </head>
 <body>
 
   <!-- Корневой элемент приложения -->
   <div id="app"></div>
 
-  <!-- Точка входа (Standalone Bundle) -->
-  <script src="./js/bundle.js"></script>
+  <!-- Точка входа (Standalone Bundle + Cache buster) -->
+  <script src="./js/bundle.js?v=4.0"></script>
 
 </body>
 </html>
