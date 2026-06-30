@@ -1136,7 +1136,7 @@
       const topics = risks.length ? risks : [7,8,9];
 
       const opt = {
-        margin: 0,
+        margin: [0, 0, 0, 0],
         filename: 'ne-50-50-peregovornaya-shpargalka.pdf',
         image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 },
@@ -1241,14 +1241,21 @@
       wrapper.appendChild(container);
       document.body.appendChild(wrapper);
       
-      html2pdf().set(opt).from(container).save().then(() => {
-        document.body.removeChild(wrapper);
-      }).catch(err => {
-        console.error(err);
+      try {
+        html2pdf().set(opt).from(container).save().then(() => {
+          document.body.removeChild(wrapper);
+        }).catch(err => {
+          alert("Ошибка генерации PDF (Promise):\n" + err.message + "\n" + err.stack);
+          if (wrapper.parentNode) {
+            document.body.removeChild(wrapper);
+          }
+        });
+      } catch (err) {
+        alert("Ошибка генерации PDF (Sync):\n" + err.message + "\n" + err.stack);
         if (wrapper.parentNode) {
           document.body.removeChild(wrapper);
         }
-      });
+      }
     }
 
     function downloadWord(){
