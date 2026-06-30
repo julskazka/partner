@@ -811,8 +811,7 @@
 
         <div class="actions">
           <button class="secondary" onclick="restart()">Пройти заново</button>
-          <button class="primary" onclick="downloadPDF()" style="background: var(--accent); color: white;">Скачать PDF</button>
-          <button class="primary" onclick="downloadWord()">Скачать Word (.doc)</button>
+          <button class="primary" onclick="showExportModal()" style="background: var(--accent); color: white;">Скачать шпаргалку</button>
         </div>
       </div>
 
@@ -1072,40 +1071,105 @@
       showStep(0);
     }
 
+    function showExportModal() {
+      const overlay = document.createElement('div');
+      overlay.id = 'exportModal';
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.backgroundColor = 'rgba(32, 33, 31, 0.7)';
+      overlay.style.display = 'flex';
+      overlay.style.justifyContent = 'center';
+      overlay.style.alignItems = 'center';
+      overlay.style.zIndex = '99999';
+      overlay.style.backdropFilter = 'blur(4px)';
+
+      const modal = document.createElement('div');
+      modal.style.backgroundColor = '#fffdf8';
+      modal.style.border = '1px solid #ded8ca';
+      modal.style.borderRadius = '24px';
+      modal.style.padding = '32px';
+      modal.style.maxWidth = '440px';
+      modal.style.width = 'calc(100% - 32px)';
+      modal.style.boxShadow = '0 18px 45px rgba(40,34,25,0.18)';
+      modal.style.textAlign = 'center';
+      modal.style.fontFamily = 'Inter, sans-serif';
+
+      modal.innerHTML = `
+        <h3 style="margin-top: 0; font-size: 22px; font-weight: 900; color: #20211f; margin-bottom: 8px;">Скачать шпаргалку</h3>
+        <p style="color: #6b6b66; font-size: 14px; margin-bottom: 24px; line-height: 1.45;">
+          Выберите удобный формат документа. PDF отлично подходит для печати, а Word — для совместного редактирования.
+        </p>
+        <div style="display: grid; gap: 12px;">
+          <button id="pdfBtn" style="background: #bb2f2a; color: white; width: 100%; padding: 14px; font-weight: 800; border-radius: 14px; border: none; cursor: pointer; font-size: 15px; transition: opacity 0.15s ease;">Сохранить в PDF</button>
+          <button id="wordBtn" style="background: #20211f; color: white; width: 100%; padding: 14px; font-weight: 800; border-radius: 14px; border: none; cursor: pointer; font-size: 15px; transition: opacity 0.15s ease;">Скачать документ Word (.doc)</button>
+          <button id="closeBtn" style="background: transparent; color: #6b6b66; width: 100%; padding: 10px; font-weight: 700; border-radius: 14px; border: none; cursor: pointer; margin-top: 8px; font-size: 14px;">Отмена</button>
+        </div>
+      `;
+
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      document.getElementById('pdfBtn').onclick = () => {
+        document.body.removeChild(overlay);
+        downloadPDF();
+      };
+      document.getElementById('wordBtn').onclick = () => {
+        document.body.removeChild(overlay);
+        downloadWord();
+      };
+      document.getElementById('closeBtn').onclick = () => {
+        document.body.removeChild(overlay);
+      };
+      overlay.onclick = (e) => {
+        if (e.target === overlay) {
+          document.body.removeChild(overlay);
+        }
+      };
+    }
+
     function downloadPDF(){
       const score = Object.values(answers).reduce((a,b)=>a+b,0);
       const risks = Object.entries(answers).filter(([_,v])=>v<2).map(([k])=>Number(k));
       const topics = risks.length ? risks : [7,8,9];
 
       const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],
+        margin: [12, 12, 12, 12],
         filename: 'ne-50-50-peregovornaya-shpargalka.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'], avoid: ['.pdf-card', '.pdf-note-card', '.pdf-banner', '.pdf-score-grid', '.pdf-quote'] }
       };
 
       const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      container.style.width = '720px';
+      container.style.boxSizing = 'border-box';
       container.style.fontFamily = 'Inter, ui-sans-serif, system-ui, sans-serif';
       container.style.color = '#20211f';
       container.style.backgroundColor = '#f5f1e8';
-      container.style.padding = '24px';
+      container.style.padding = '32px';
       container.style.fontSize = '14px';
       container.style.lineHeight = '1.5';
 
       let html = `
-        <div style="text-align: center; margin-bottom: 25px;">
+        <div class="pdf-banner" style="text-align: center; margin-bottom: 25px;">
           <div style="font-weight: 900; font-size: 32px; letter-spacing: -0.03em; font-family: Inter, sans-serif;">НЕ <span style="color: #bb2f2a;">50/50</span></div>
           <div style="color: #6b6b66; font-size: 13px; margin-top: 5px;">Переговорная шпаргалка по партнёрству</div>
         </div>
 
-        <div style="padding: 24px; border-radius: 20px; background: linear-gradient(135deg,#231f1b,#4b3328); color: #fff; margin-bottom: 20px; font-family: Inter, sans-serif;">
+        <div class="pdf-banner" style="padding: 24px; border-radius: 20px; background: linear-gradient(135deg,#231f1b,#4b3328); color: #fff; margin-bottom: 20px; font-family: Inter, sans-serif;">
           <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.72; margin-bottom: 8px; font-weight: 800;">Ваш партнёрский диагноз</div>
           <h2 style="color: #fff; font-size: 24px; margin: 0 0 10px 0; font-weight: 900; letter-spacing: -0.03em;">${document.getElementById("resultTitle").textContent}</h2>
           <p style="margin: 0; color: rgba(255,255,255,0.82); font-size: 14px; line-height: 1.45;">${document.getElementById("resultLead").textContent}</p>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; font-family: Inter, sans-serif;">
+        <div class="pdf-score-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; font-family: Inter, sans-serif;">
           <div style="padding: 16px; border: 1px solid #ded8ca; border-radius: 16px; background: #fff; text-align: center;">
             <b style="display: block; font-size: 28px; color: #20211f; margin-bottom: 4px; font-weight: 950;">${score}/20</b>
             <span style="color: #6b6b66; font-size: 12px; font-weight: 600;">готовность к партнёрству</span>
@@ -1116,25 +1180,19 @@
           </div>
         </div>
 
-        <div style="font-family: Georgia, serif; font-size: 16px; line-height: 1.5; margin-bottom: 25px; padding: 18px 20px; border: 1px dashed #b7aa95; border-radius: 16px; background: #fffaf1;">
+        <div class="pdf-quote" style="font-family: Georgia, serif; font-size: 16px; line-height: 1.5; margin-bottom: 25px; padding: 18px 20px; border: 1px dashed #b7aa95; border-radius: 16px; background: #fffaf1;">
           ${document.getElementById("resultQuote").textContent}
         </div>
       `;
 
-      // Разрыв страницы после титульного блока
+      // Разделяем титульный блок и карточки
       html += `<div style="page-break-before: always;"></div>`;
-
       html += `<h3 style="font-size: 18px; color: #20211f; margin: 25px 0 15px 0; border-bottom: 2px solid #bb2f2a; padding-bottom: 6px; font-weight: 900; letter-spacing: -0.02em; font-family: Inter, sans-serif;">Разговоры, которые лучше провести до запуска</h3>`;
 
       topics.forEach((k, index) => {
-        // Добавляем разрыв страницы каждые 2 карточки для исключения обрезаний текста
-        if (index > 0 && index % 2 === 0) {
-          html += `<div style="page-break-before: always;"></div>`;
-        }
-
         const d = topicDetails[k];
         html += `
-          <div style="margin-bottom: 20px; border: 1px solid #ded8ca; border-radius: 18px; background: #fff; padding: 18px; font-family: Inter, sans-serif;">
+          <div class="pdf-card" style="margin-bottom: 20px; border: 1px solid #ded8ca; border-radius: 18px; background: #fff; padding: 18px; font-family: Inter, sans-serif;">
             <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;">
               <div style="width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #f7e5e2; color: #bb2f2a; font-weight: 900; font-size: 14px; flex-shrink: 0;">${index+1}</div>
               <div style="flex: 1;">
@@ -1152,7 +1210,6 @@
         `;
       });
 
-      // Разрыв перед заметками
       html += `<div style="page-break-before: always;"></div>`;
       html += `
         <h3 style="font-size: 18px; color: #20211f; margin: 30px 0 15px 0; border-bottom: 2px solid #bb2f2a; padding-bottom: 6px; font-weight: 900; letter-spacing: -0.02em; font-family: Inter, sans-serif;">Ваши заметки</h3>
@@ -1160,11 +1217,11 @@
 
       const filled = Object.entries(notes).filter(([_,v])=>v);
       if(!filled.length){
-        html += `<div style="color: #6b6b66; font-style: italic; margin-bottom: 20px; font-family: Inter, sans-serif;">Заметок нет. Рекомендуется пройти вопросы вместе с вашим будущим партнёром.</div>`;
+        html += `<div class="pdf-note-card" style="color: #6b6b66; font-style: italic; margin-bottom: 20px; font-family: Inter, sans-serif;">Заметок нет. Рекомендуется пройти вопросы вместе с вашим будущим партнёром.</div>`;
       } else {
         filled.forEach(([k,v]) => {
           html += `
-            <div style="margin-bottom: 12px; padding: 12px 14px; border-left: 4px solid #bb2f2a; background: #fff; border-radius: 0 14px 14px 0; font-family: Inter, sans-serif;">
+            <div class="pdf-note-card" style="margin-bottom: 12px; padding: 12px 14px; border-left: 4px solid #bb2f2a; background: #fff; border-radius: 0 14px 14px 0; font-family: Inter, sans-serif;">
               <strong style="font-size: 13px; color: #6b6b66; display: block; margin-bottom: 4px;">${topicMap[k]}</strong>
               <div style="white-space: pre-wrap; font-size: 14px; color: #20211f;">${escapeHtml(v)}</div>
             </div>
@@ -1179,10 +1236,13 @@
       `;
 
       container.innerHTML = html;
+      document.body.appendChild(container);
       
-      html2pdf().set(opt).from(container).save().catch(err => {
+      html2pdf().set(opt).from(container).save().then(() => {
+        document.body.removeChild(container);
+      }).catch(err => {
         console.error(err);
-        alert("Произошла ошибка при сохранении PDF.");
+        document.body.removeChild(container);
       });
     }
 
