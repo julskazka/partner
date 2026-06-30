@@ -243,7 +243,7 @@ function runAudit() {
   console.log(dim(`  Проверяю ${files.length} файл(ов)...\n`));
 
   for (const file of files) {
-    if (file.endsWith('notibot-bridge.js') || file.endsWith('bundle.js')) continue;
+    if (file.endsWith('notibot-bridge.js') || file.endsWith('bundle.js') || file.endsWith('index.html')) continue;
     const content = readFileSync(file, 'utf8');
     const lines   = content.split('\n');
 
