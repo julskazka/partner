@@ -811,7 +811,8 @@
 
         <div class="actions">
           <button class="secondary" onclick="restart()">Пройти заново</button>
-          <button class="primary" onclick="downloadMemo()">Скачать переговорную шпаргалку</button>
+          <button class="primary" onclick="downloadPDF()" style="background: var(--accent); color: white;">Скачать PDF</button>
+          <button class="primary" onclick="downloadWord()">Скачать Word (.doc)</button>
         </div>
       </div>
 
@@ -1071,7 +1072,7 @@
       showStep(0);
     }
 
-    function downloadMemo(){
+    function downloadPDF(){
       const score = Object.values(answers).reduce((a,b)=>a+b,0);
       const risks = Object.entries(answers).filter(([_,v])=>v<2).map(([k])=>Number(k));
       const topics = risks.length ? risks : [7,8,9];
@@ -1118,14 +1119,22 @@
         <div style="font-family: Georgia, serif; font-size: 16px; line-height: 1.5; margin-bottom: 25px; padding: 18px 20px; border: 1px dashed #b7aa95; border-radius: 16px; background: #fffaf1;">
           ${document.getElementById("resultQuote").textContent}
         </div>
-
-        <h3 style="font-size: 18px; color: #20211f; margin: 25px 0 15px 0; border-bottom: 2px solid #bb2f2a; padding-bottom: 6px; font-weight: 900; letter-spacing: -0.02em; font-family: Inter, sans-serif;">Разговоры, которые лучше провести до запуска</h3>
       `;
 
+      // Разрыв страницы после титульного блока
+      html += `<div style="page-break-before: always;"></div>`;
+
+      html += `<h3 style="font-size: 18px; color: #20211f; margin: 25px 0 15px 0; border-bottom: 2px solid #bb2f2a; padding-bottom: 6px; font-weight: 900; letter-spacing: -0.02em; font-family: Inter, sans-serif;">Разговоры, которые лучше провести до запуска</h3>`;
+
       topics.forEach((k, index) => {
+        // Добавляем разрыв страницы каждые 2 карточки для исключения обрезаний текста
+        if (index > 0 && index % 2 === 0) {
+          html += `<div style="page-break-before: always;"></div>`;
+        }
+
         const d = topicDetails[k];
         html += `
-          <div style="margin-bottom: 20px; border: 1px solid #ded8ca; border-radius: 18px; background: #fff; padding: 18px; page-break-inside: avoid; font-family: Inter, sans-serif;">
+          <div style="margin-bottom: 20px; border: 1px solid #ded8ca; border-radius: 18px; background: #fff; padding: 18px; font-family: Inter, sans-serif;">
             <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;">
               <div style="width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #f7e5e2; color: #bb2f2a; font-weight: 900; font-size: 14px; flex-shrink: 0;">${index+1}</div>
               <div style="flex: 1;">
@@ -1143,8 +1152,10 @@
         `;
       });
 
+      // Разрыв перед заметками
+      html += `<div style="page-break-before: always;"></div>`;
       html += `
-        <h3 style="font-size: 18px; color: #20211f; margin: 30px 0 15px 0; border-bottom: 2px solid #bb2f2a; padding-bottom: 6px; font-weight: 900; letter-spacing: -0.02em; font-family: Inter, sans-serif; page-break-before: auto;">Ваши заметки</h3>
+        <h3 style="font-size: 18px; color: #20211f; margin: 30px 0 15px 0; border-bottom: 2px solid #bb2f2a; padding-bottom: 6px; font-weight: 900; letter-spacing: -0.02em; font-family: Inter, sans-serif;">Ваши заметки</h3>
       `;
 
       const filled = Object.entries(notes).filter(([_,v])=>v);
@@ -1173,6 +1184,119 @@
         console.error(err);
         alert("Произошла ошибка при сохранении PDF.");
       });
+    }
+
+    function downloadWord(){
+      const score = Object.values(answers).reduce((a,b)=>a+b,0);
+      const risks = Object.entries(answers).filter(([_,v])=>v<2).map(([k])=>Number(k));
+      const topics = risks.length ? risks : [7,8,9];
+
+      let html = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset="utf-8">
+          <title>Переговорная шпаргалка</title>
+          <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f1e8; color: #20211f; padding: 30px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .brand { font-size: 28pt; font-weight: bold; color: #20211f; }
+            .accent { color: #bb2f2a; }
+            .sub { font-size: 11pt; color: #6b6b66; margin-top: 5px; }
+            .banner { padding: 20px; border-radius: 12px; background-color: #231f1b; color: #ffffff; margin-bottom: 25px; }
+            .banner h2 { margin: 0 0 10px 0; color: #ffffff; font-size: 18pt; }
+            .banner p { margin: 0; color: #d0d0d0; font-size: 11pt; }
+            .score-table { width: 100%; margin-bottom: 25px; border-collapse: collapse; }
+            .score-card { padding: 15px; border: 1px solid #ded8ca; background-color: #ffffff; text-align: center; width: 50%; }
+            .score-val { font-size: 24pt; font-weight: bold; color: #bb2f2a; }
+            .quote { font-style: italic; font-size: 12pt; margin-bottom: 30px; padding: 15px; border-left: 5px solid #bb2f2a; background-color: #fffaf1; }
+            .section-title { font-size: 16pt; font-weight: bold; color: #20211f; border-bottom: 2px solid #bb2f2a; padding-bottom: 5px; margin-top: 30px; }
+            .risk-card { margin-bottom: 25px; border: 1px solid #ded8ca; background-color: #ffffff; padding: 20px; border-radius: 12px; }
+            .risk-title { font-size: 13pt; font-weight: bold; color: #20211f; }
+            .risk-sub { font-size: 10pt; color: #6b6b66; margin-top: 2px; }
+            .block { padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 10pt; }
+            .block-why { background-color: #fff4e4; }
+            .block-ask { background-color: #eef4f2; }
+            .block-fix { background-color: #f1eef8; }
+            .block-start { background-color: #f8eeee; }
+            .note-card { padding: 12px; border-left: 4px solid #bb2f2a; background-color: #ffffff; margin-bottom: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="brand">НЕ <span class="accent">50/50</span></div>
+            <div class="sub">Переговорная шпаргалка по партнёрству</div>
+          </div>
+
+          <div class="banner">
+            <h2>${document.getElementById("resultTitle").textContent}</h2>
+            <p>${document.getElementById("resultLead").textContent}</p>
+          </div>
+
+          <table class="score-table">
+            <tr>
+              <td class="score-card">
+                <div class="score-val">${score}/20</div>
+                <div class="sub">готовность к партнёрству</div>
+              </td>
+              <td class="score-card">
+                <div class="score-val" style="color:#bb2f2a;">${risks.length}</div>
+                <div class="sub">важных тем до запуска</div>
+              </td>
+            </tr>
+          </table>
+
+          <div class="quote">
+            ${document.getElementById("resultQuote").textContent}
+          </div>
+
+          <div class="section-title">Разговоры, которые лучше провести до запуска</div>
+      `;
+
+      topics.forEach((k, index) => {
+        const d = topicDetails[k];
+        html += `
+          <div class="risk-card">
+            <div class="risk-title">${index+1}. ${d.title}</div>
+            <div class="risk-sub">${d.sub}</div>
+            <div class="block block-why"><b>Почему это важно:</b><br>${d.why}</div>
+            <div class="block block-ask"><b>Что спросить друг у друга:</b><br>${d.ask.map(x=>"— "+x).join("<br>")}</div>
+            <div class="block block-fix"><b>Что зафиксировать:</b><br>${d.fix}</div>
+            <div class="block block-start"><b>Как начать:</b><br>${d.start}</div>
+          </div>
+        `;
+      });
+
+      html += `<div class="section-title">Ваши заметки</div>`;
+
+      const filled = Object.entries(notes).filter(([_,v])=>v);
+      if(!filled.length){
+        html += `<p style="color: #6b6b66; font-style: italic;">Заметок нет. Рекомендуется пройти вопросы вместе с вашим будущим партнёром.</p>`;
+      } else {
+        filled.forEach(([k,v]) => {
+          html += `
+            <div class="note-card">
+              <strong>${topicMap[k]}</strong><br>
+              <div style="margin-top:5px; white-space:pre-wrap;">${escapeHtml(v)}</div>
+            </div>
+          `;
+        });
+      }
+
+      html += `
+          <p style="text-align: center; color: #6b6b66; font-size: 9pt; margin-top: 40px; border-top: 1px solid #ded8ca; padding-top: 10px;">
+            Авторская методика Анастасии Котовой · Честный маркетинг · Партнёрство вдолгую
+          </p>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ne-50-50-peregovornaya-shpargalka.doc";
+      a.click();
+      URL.revokeObjectURL(url);
     }
   </script>
 
