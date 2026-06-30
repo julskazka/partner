@@ -1136,21 +1136,21 @@
       const topics = risks.length ? risks : [7,8,9];
 
       const opt = {
-        margin: [12, 12, 12, 12],
+        margin: 0,
         filename: 'ne-50-50-peregovornaya-shpargalka.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0, scrollX: 0 },
+        html2canvas: { scale: 3, useCORS: true, logging: false, scrollY: 0, scrollX: 0 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'], avoid: '.pdf-card, .pdf-note-card, .pdf-banner, .pdf-score-grid, .pdf-quote' }
       };
 
       const container = document.createElement('div');
-      container.style.width = '750px';
+      container.style.width = '794px';
       container.style.boxSizing = 'border-box';
       container.style.fontFamily = 'Inter, ui-sans-serif, system-ui, sans-serif';
       container.style.color = '#20211f';
-      container.style.backgroundColor = '#f5f1e8';
-      container.style.padding = '32px';
+      container.style.background = 'radial-gradient(circle at top left, rgba(187,47,42,0.08), transparent 32%), radial-gradient(circle at bottom right, rgba(29,77,67,0.08), transparent 28%), #f5f1e8';
+      container.style.padding = '48px';
       container.style.fontSize = '14px';
       container.style.lineHeight = '1.5';
 
