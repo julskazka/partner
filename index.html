@@ -481,7 +481,9 @@
     }
 
   </style>
-<style>html,body,#root{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;margin:0;padding:0}html,body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Helvetica Neue,Arial,sans-serif!important}button,input,textarea,select{font-family:inherit}html{background-color:transparent}html.chatgptOled.dark,html.mobileSkybridge.dark{background-color:#000}@supports (font: -apple-system-body){html.mobileSkybridge{font:-apple-system-body}}html.desktopSkybridge.dark{background-color:#1e1e1e}html.androidSkybridge,html.androidSkybridge body,html.androidSkybridge *{-webkit-tap-highlight-color:rgba(255,255,255,0)}html.androidSkybridge *::selection,html.androidSkybridge *::-moz-selection{background:#fff0;color:inherit}</style></head>
+<style>html,body,#root{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;margin:0;padding:0}html,body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Helvetica Neue,Arial,sans-serif!important}button,input,textarea,select{font-family:inherit}html{background-color:transparent}html.chatgptOled.dark,html.mobileSkybridge.dark{background-color:#000}@supports (font: -apple-system-body){html.mobileSkybridge{font:-apple-system-body}}html.desktopSkybridge.dark{background-color:#1e1e1e}html.androidSkybridge,html.androidSkybridge body,html.androidSkybridge *{-webkit-tap-highlight-color:rgba(255,255,255,0)}html.androidSkybridge *::selection,html.androidSkybridge *::-moz-selection{background:#fff0;color:inherit}</style>
+<script src="./js/html2pdf.bundle.min.js"></script>
+</head>
 <body>
   <main class="app">
     <div class="topbar">
@@ -1070,44 +1072,107 @@
     }
 
     function downloadMemo(){
-      const score=Object.values(answers).reduce((a,b)=>a+b,0);
-      const risks=Object.entries(answers).filter(([_,v])=>v<2).map(([k])=>Number(k));
-      const topics=risks.length ? risks : [7,8,9];
+      const score = Object.values(answers).reduce((a,b)=>a+b,0);
+      const risks = Object.entries(answers).filter(([_,v])=>v<2).map(([k])=>Number(k));
+      const topics = risks.length ? risks : [7,8,9];
 
-      let text=`НЕ 50/50\nПереговорная шпаргалка по партнёрству\n\n`;
-      text+=`РЕЗУЛЬТАТ\n${document.getElementById("resultTitle").textContent}\n`;
-      text+=`${document.getElementById("resultLead").textContent}\n`;
-      text+=`Баллы: ${score}/20\n\n`;
+      const opt = {
+        margin: [0.5, 0.5, 0.5, 0.5],
+        filename: 'ne-50-50-peregovornaya-shpargalka.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
 
-      text+=`РАЗГОВОРЫ, КОТОРЫЕ НУЖНО ПРОВЕСТИ\n`;
-      topics.forEach((k,i)=>{
-        const d=topicDetails[k];
-        text+=`\n${i+1}. ${d.title}\n`;
-        text+=`Почему важно: ${d.why}\n`;
-        text+=`Что спросить:\n${d.ask.map(x=>"— "+x).join("\n")}\n`;
-        text+=`Что зафиксировать: ${d.fix}\n`;
-        text+=`Начать можно так: ${d.start}\n`;
+      const container = document.createElement('div');
+      container.style.fontFamily = 'Inter, ui-sans-serif, system-ui, sans-serif';
+      container.style.color = '#20211f';
+      container.style.backgroundColor = '#f5f1e8';
+      container.style.padding = '24px';
+      container.style.fontSize = '14px';
+      container.style.lineHeight = '1.5';
+
+      let html = `
+        <div style="text-align: center; margin-bottom: 25px;">
+          <div style="font-weight: 900; font-size: 32px; letter-spacing: -0.03em; font-family: Inter, sans-serif;">НЕ <span style="color: #bb2f2a;">50/50</span></div>
+          <div style="color: #6b6b66; font-size: 13px; margin-top: 5px;">Переговорная шпаргалка по партнёрству</div>
+        </div>
+
+        <div style="padding: 24px; border-radius: 20px; background: linear-gradient(135deg,#231f1b,#4b3328); color: #fff; margin-bottom: 20px; font-family: Inter, sans-serif;">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.72; margin-bottom: 8px; font-weight: 800;">Ваш партнёрский диагноз</div>
+          <h2 style="color: #fff; font-size: 24px; margin: 0 0 10px 0; font-weight: 900; letter-spacing: -0.03em;">${document.getElementById("resultTitle").textContent}</h2>
+          <p style="margin: 0; color: rgba(255,255,255,0.82); font-size: 14px; line-height: 1.45;">${document.getElementById("resultLead").textContent}</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; font-family: Inter, sans-serif;">
+          <div style="padding: 16px; border: 1px solid #ded8ca; border-radius: 16px; background: #fff; text-align: center;">
+            <b style="display: block; font-size: 28px; color: #20211f; margin-bottom: 4px; font-weight: 950;">${score}/20</b>
+            <span style="color: #6b6b66; font-size: 12px; font-weight: 600;">готовность к партнёрству</span>
+          </div>
+          <div style="padding: 16px; border: 1px solid #ded8ca; border-radius: 16px; background: #fff; text-align: center;">
+            <b style="display: block; font-size: 28px; color: #bb2f2a; margin-bottom: 4px; font-weight: 950;">${risks.length}</b>
+            <span style="color: #6b6b66; font-size: 12px; font-weight: 600;">важных тем до запуска</span>
+          </div>
+        </div>
+
+        <div style="font-family: Georgia, serif; font-size: 16px; line-height: 1.5; margin-bottom: 25px; padding: 18px 20px; border: 1px dashed #b7aa95; border-radius: 16px; background: #fffaf1;">
+          ${document.getElementById("resultQuote").textContent}
+        </div>
+
+        <h3 style="font-size: 18px; color: #20211f; margin: 25px 0 15px 0; border-bottom: 2px solid #bb2f2a; padding-bottom: 6px; font-weight: 900; letter-spacing: -0.02em; font-family: Inter, sans-serif;">Разговоры, которые лучше провести до запуска</h3>
+      `;
+
+      topics.forEach((k, index) => {
+        const d = topicDetails[k];
+        html += `
+          <div style="margin-bottom: 20px; border: 1px solid #ded8ca; border-radius: 18px; background: #fff; padding: 18px; page-break-inside: avoid; font-family: Inter, sans-serif;">
+            <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #f7e5e2; color: #bb2f2a; font-weight: 900; font-size: 14px; flex-shrink: 0;">${index+1}</div>
+              <div style="flex: 1;">
+                <div style="font-weight: 900; font-size: 18px; color: #20211f; line-height: 1.2;">${d.title}</div>
+                <div style="font-size: 13px; color: #6b6b66; margin-top: 3px;">${d.sub}</div>
+              </div>
+            </div>
+            <div style="margin-left: 46px; font-size: 13px; display: grid; gap: 8px;">
+              <div style="padding: 10px 12px; border-radius: 12px; background: #fff4e4;"><b>Почему это важно:</b><br>${d.why}</div>
+              <div style="padding: 10px 12px; border-radius: 12px; background: #eef4f2;"><b>Что спросить друг у друга:</b><br>${d.ask.map(x=>"— "+x).join("<br>")}</div>
+              <div style="padding: 10px 12px; border-radius: 12px; background: #f1eef8;"><b>Что зафиксировать:</b><br>${d.fix}</div>
+              <div style="padding: 10px 12px; border-radius: 12px; background: #f8eeee;"><b>Как начать:</b><br>${d.start}</div>
+            </div>
+          </div>
+        `;
       });
 
-      text+=`\nМОИ ЗАМЕТКИ\n`;
-      const filled=Object.entries(notes).filter(([_,v])=>v);
+      html += `
+        <h3 style="font-size: 18px; color: #20211f; margin: 30px 0 15px 0; border-bottom: 2px solid #bb2f2a; padding-bottom: 6px; font-weight: 900; letter-spacing: -0.02em; font-family: Inter, sans-serif; page-break-before: auto;">Ваши заметки</h3>
+      `;
+
+      const filled = Object.entries(notes).filter(([_,v])=>v);
       if(!filled.length){
-        text+=`Заметок нет. Значит, первый шаг — пройти вопросы вместе с партнёром.\n`;
-      }else{
-        filled.forEach(([k,v])=>{
-          text+=`\n${topicMap[k]}:\n${v}\n`;
+        html += `<div style="color: #6b6b66; font-style: italic; margin-bottom: 20px; font-family: Inter, sans-serif;">Заметок нет. Рекомендуется пройти вопросы вместе с вашим будущим партнёром.</div>`;
+      } else {
+        filled.forEach(([k,v]) => {
+          html += `
+            <div style="margin-bottom: 12px; padding: 12px 14px; border-left: 4px solid #bb2f2a; background: #fff; border-radius: 0 14px 14px 0; font-family: Inter, sans-serif;">
+              <strong style="font-size: 13px; color: #6b6b66; display: block; margin-bottom: 4px;">${topicMap[k]}</strong>
+              <div style="white-space: pre-wrap; font-size: 14px; color: #20211f;">${escapeHtml(v)}</div>
+            </div>
+          `;
         });
       }
 
-      text+=`\nГлавное: партнёрство вдолгую начинается не там, где вы во всём совпали, а там, где перестали совпадать — и всё-таки смогли договориться.\n`;
+      html += `
+        <div style="margin-top: 40px; text-align: center; border-top: 1px solid #ded8ca; padding-top: 20px; color: #6b6b66; font-size: 12px; font-family: Inter, sans-serif;">
+          Авторская методика Анастасии Котовой · Честный маркетинг · Партнёрство вдолгую
+        </div>
+      `;
 
-      const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement("a");
-      a.href=url;
-      a.download="ne-50-50-peregovornaya-shpargalka.txt";
-      a.click();
-      URL.revokeObjectURL(url);
+      container.innerHTML = html;
+      
+      html2pdf().set(opt).from(container).save().catch(err => {
+        console.error(err);
+        alert("Произошла ошибка при сохранении PDF.");
+      });
     }
   </script>
 
