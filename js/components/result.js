@@ -1,158 +1,148 @@
-// js/components/result.js
-// ПАРТНЁРСКИЙ СИМУЛЯТОР 3.0 — COMPONENT: RESULT DASHBOARD
+/* js/components/result.js — Result Calculations, Renders, and Memo Download */
+import { topicDetails } from './quiz-data-details.js';
+import { topicMap } from './quiz-data.js';
+import { escapeHtml } from '../utils.js';
 
-const RESULT_MODELS = {
-  novice: {
-    badge: 'ПАРТНЁР 0 (НОВИЧОК)',
-    title: 'МОДЕЛЬ: СТАРТ ЧЕРЕЗ МИКРО-ПАРТНЁРСТВА',
-    potential: '+ 5 000 – 30 000 ₽ / мес',
-    analytics: [
-      { label: 'Структура', value: 'слабая', type: 'warn' },
-      { label: 'Связки', value: 'отсутствуют', type: 'bad' },
-      { label: 'Потенциал роста', value: 'высокий', type: 'good' }
-    ],
-    progressBars: { traffic: '███░░ 60%', partner: '██░░░ 40%', offer: '███░░ 60%' },
-    actions: ['Выбрать 1 целевую нишу', 'Найти 3 подходящих партнёров', 'Запустить простую связку'],
-    leaks: ['Нет системного процесса', 'Хаотичный выбор партнёров', 'Отсутствие готовой связки']
-  },
-  product: {
-    badge: 'ПАРТНЁР 1 (ЕСТЬ ПРОДУКТ)',
-    title: 'МОДЕЛЬ: ОФФЕР ➔ ПАРТНЁРСКИЕ ИСТОЧНИКИ',
-    potential: '+ x2 – x5 РОСТ ВЫРУЧКИ',
-    analytics: [
-      { label: 'Продукт', value: 'упакован', type: 'good' },
-      { label: 'Трафик-система', value: 'не настроена', type: 'bad' },
-      { label: 'Потенциал масштаба', value: 'максимальный', type: 'good' }
-    ],
-    progressBars: { traffic: '██░░░ 40%', partner: '████░ 80%', offer: '█████ 100%' },
-    actions: ['Упаковать оффер для партнеров', 'Подключить первые трафик-каналы', 'Запустить партнёрскую сеть'],
-    leaks: ['Есть продукт, но нет трафик-системы', 'Отсутствие партнерских выплат', 'Ручные продажи']
-  },
-  audience: {
-    badge: 'ПАРТНЁР 2 (ЕСТЬ АУДИТОРИЯ)',
-    title: 'МОДЕЛЬ: ИНТЕГРАЦИИ ЧЕРЕЗ ПАРТНЁРОВ',
-    potential: '+ ОТ 100 000+ ₽ СТАБИЛЬНО',
-    analytics: [
-      { label: 'Ресурс', value: 'есть аудитория', type: 'good' },
-      { label: 'Монетизация', value: 'нерегулярная', type: 'warn' },
-      { label: 'Конверсия в клик', value: 'требует роста', type: 'warn' }
-    ],
-    progressBars: { traffic: '█████ 100%', partner: '███░░ 60%', offer: '██░░░ 40%' },
-    actions: ['Подобрать офферы под аудиторию', 'Внедрить нативную интеграцию', 'Автоматизировать монетизацию'],
-    leaks: ['Есть ресурс, но нет монетизации связок', 'Низкая конверсия в клик', 'Нерегулярные офферы']
-  },
-  experienced: {
-    badge: 'ПАРТНЁР (СЛОМАННАЯ СИСТЕМА)',
-    title: 'МОДЕЛЬ: ПЕРЕСБОРКА И МАСШТАБИРОВАНИЕ',
-    potential: '+ АВТОДОХОД И Х3 СИСТЕМА',
-    analytics: [
-      { label: 'Опыт', value: 'подтвержден', type: 'good' },
-      { label: 'Воронка', value: 'хаотична', type: 'bad' },
-      { label: 'Потеря трафика', value: 'критическая', type: 'bad' }
-    ],
-    progressBars: { traffic: '████░ 80%', partner: '███░░ 60%', offer: '███░░ 60%' },
-    actions: ['Аудит текущих связок', 'Устранение хаоса в воронке', 'Систематизация партнерской карты'],
-    leaks: ['Хаос и отсутствие структуры', 'Потеря сливного трафика', 'Сломанные цепочки продаж']
+export function calculateResult(answers) {
+  const score = Object.values(answers).reduce((a, b) => a + b, 0);
+  const risks = Object.entries(answers).filter(([_, v]) => v < 2).map(([k]) => Number(k));
+
+  let title = "Пока это коллективная галлюцинация.", decision = "talk";
+  let lead = "Идея может быть прекрасной, но партнёрство пока существует преимущественно в воображении. Сначала роли, деньги, власть, права и выход. Потом синергия.";
+  let quote = "Будущие миллионы уже поделены. Настоящая ответственность пока нет. Начнём с неё.";
+
+  if (score >= 17) {
+    title = "Можно входить. Но не на честном слове.";
+    lead = "Каркас партнёрства у вас есть. Теперь превратите понимание в письменные правила, проведите пилот и не решайте, что высокий балл выдаёт иммунитет от конфликтов.";
+    quote = "Вы уже похожи на партнёров, а не на двух людей, которым одновременно понравилась одна идея. Это обнадёживает. Документы всё равно нужны.";
+    decision = "go";
+  } else if (score >= 12) {
+    title = "Потенциал есть. Договорённостей пока меньше.";
+    lead = "Из этого может получиться сильный продукт, но часть конструкции держится на предположениях. Сначала закройте разговоры ниже — иначе они всё равно состоятся, только дороже.";
+    quote = "Сейчас вам нужен не ещё один вдохновляющий созвон. Вам нужен один неудобный, но очень конкретный.";
+    decision = "pilot";
+  } else if (score >= 7) {
+    title = "Только пилот. Никаких империй.";
+    lead = "Пока у вас больше взаимного интереса, чем рабочей системы. Проверьте друг друга на коротком цикле и не создавайте активы, которые потом придётся делить лопатой.";
+    quote = "Не покупайте корпоративный домен до первого совместного дедлайна. Это не суеверие. Это экономия.";
+    decision = "pilot";
   }
-};
 
-/**
- * Рендер финального результата симулятора в стиле Visual System 3.0
- */
-export function renderResult(selectedAnswers) {
-  const role = selectedAnswers.step1 || 'novice';
-  const model = RESULT_MODELS[role] || RESULT_MODELS.novice;
+  return { score, risks, title, lead, quote, decision };
+}
 
-  const leaksList = model.leaks.map(l => `
-    <div class="flex items-center gap-2 text-[#FF4D4D] text-xs font-semibold">
-      <span class="text-sm">❌</span> ${l}
-    </div>
-  `).join('');
-
-  const actionsList = model.actions.map((a, i) => `
-    <div class="p-3.5 rounded-xl bg-[#111827] border border-white/5 text-xs text-white font-semibold flex items-center gap-3">
-      <span class="w-6 h-6 rounded-lg bg-[#4F8CFF]/15 text-[#4F8CFF] flex items-center justify-center flex-shrink-0 text-xs font-mono font-bold">${i+1}</span>
-      <span>${a}</span>
-    </div>
-  `).join('');
-
-  const analyticsHtml = model.analytics.map(item => {
-    let colorClass = 'text-[#A7B0C0]';
-    let dot = '●';
-    if (item.type === 'good') { colorClass = 'text-[#2EE59D]'; dot = '🟢'; }
-    if (item.type === 'warn') { colorClass = 'text-[#4F8CFF]'; dot = '🟡'; }
-    if (item.type === 'bad')  { colorClass = 'text-[#FF4D4D]'; dot = '🔴'; }
-    return `<div class="flex justify-between items-center text-xs border-b border-white/5 pb-1.5"><span class="text-[#A7B0C0]">${item.label}:</span><span class="${colorClass} font-bold font-mono">${dot} ${item.value}</span></div>`;
+export function renderResult(score, risks, title, lead, quote, decision, notes, openRisks) {
+  const topics = risks.length ? risks : [7, 8, 9];
+  const riskCardsHtml = topics.map((k, index) => {
+    const d = topicDetails[k];
+    const isOpen = openRisks.includes(k);
+    return `
+      <div class="risk-card ${isOpen ? 'open' : ''}" data-risk-id="${k}">
+        <div class="risk-head btn-press">
+          <div class="risk-number">${index + 1}</div>
+          <div style="flex:1; text-align:left;">
+            <div class="risk-title">${d.title}</div>
+            <div class="risk-sub">${d.sub}</div>
+          </div>
+          <div class="risk-toggle">${isOpen ? '−' : '+'}</div>
+        </div>
+        <div class="risk-body" style="${isOpen ? 'display:block;' : 'display:none;'}">
+          <div class="risk-block why"><b>Почему это важно</b>${d.why}</div>
+          <div class="risk-block ask"><b>Что спросить друг у друга</b>${d.ask.map(x => "— " + x).join("<br>")}</div>
+          <div class="risk-block fix"><b>Что должно появиться после разговора</b>${d.fix}</div>
+          <div class="risk-block start"><b>Как начать, не включая корпоративного робота</b>${d.start}</div>
+        </div>
+      </div>
+    `;
   }).join('');
 
+  const notesFilled = Object.entries(notes).filter(([_, v]) => v.trim());
+  const notesHtml = notesFilled.length 
+    ? notesFilled.map(([k, v]) => `<p><strong>${topicMap[k]}:</strong><br>${escapeHtml(v)}</p>`).join('')
+    : '<p>Заметок нет. Возможно, вы всё держите в голове. Там же обычно лежат доступы и устные доли.</p>';
+
   return `
-    <div class="dashboard-card p-6 space-y-6 fade-in">
-      <!-- Заголовок / Бейдж -->
-      <div class="text-center space-y-2">
-        <span class="dashboard-badge-green">
-          💰 УРОВЕНЬ: ${model.badge}
-        </span>
-        <h2 class="text-lg font-extrabold text-white uppercase tracking-wide mt-2">${model.title}</h2>
+    <div class="step active" data-step="11" data-title="Результат">
+      <div class="kicker">Диагностика завершена</div>
+
+      <div class="result-hero">
+        <div class="eyebrow">Ваш партнёрский диагноз</div>
+        <h2 id="resultTitle">${title}</h2>
+        <p id="resultLead">${lead}</p>
       </div>
 
-      <!-- Денежный блок (Финансовый Потенциал) -->
-      <div class="p-5 rounded-2xl bg-gradient-to-br from-[#151C2C] to-[#111827] border border-[#2EE59D]/30 text-center space-y-1.5 shadow-[0_0_20px_rgba(46,229,157,0.1)]">
-        <div class="text-xs font-bold text-[#A7B0C0] uppercase tracking-wider">ФИНАНСОВЫЙ ПОТЕНЦИАЛ СИСТЕМЫ:</div>
-        <div class="text-2xl font-black text-[#2EE59D] tracking-tight font-mono">${model.potential}</div>
+      <div class="score-grid">
+        <div class="score-card"><b id="scoreValue">${score}/20</b><span class="muted">готовность к партнёрству</span></div>
+        <div class="score-card"><b id="riskValue">${risks.length}</b><span class="muted">разговоров, которые лучше провести до запуска</span></div>
       </div>
 
-      <!-- Аналитический Блок (AI Дашборд) -->
-      <div class="code-block space-y-2">
-        <div class="text-[#4F8CFF] font-bold text-xs uppercase tracking-wider mb-2">📊 АНАЛИТИКА ТЕКУЩЕЙ ТОЧКИ:</div>
-        ${analyticsHtml}
+      <div class="microcopy" id="resultQuote">${quote}</div>
+
+      <h3>Не просто «что обсудить», а что именно с этим делать</h3>
+      <p class="muted">Нажимайте на карточки. Внутри — смысл, вопросы, договорённость и готовая фраза для начала разговора.</p>
+      
+      <div id="riskStack" class="risk-stack">
+        ${riskCardsHtml}
       </div>
 
-      <!-- Индикатор сборки системы (ASCII Progress Bars) -->
-      <div class="p-4 rounded-xl bg-[#111827] border border-white/5 space-y-2 font-mono text-xs">
-        <div class="text-[#4F8CFF] font-bold uppercase tracking-wider text-[11px] mb-1">⚙️ АРХИТЕКТУРА СВЯЗКИ:</div>
-        <div class="flex justify-between text-[#A7B0C0]"><span>Трафик</span> <span class="text-white">${model.progressBars.traffic}</span></div>
-        <div class="flex justify-between text-[#A7B0C0]"><span>Партнёр</span> <span class="text-white">${model.progressBars.partner}</span></div>
-        <div class="flex justify-between text-[#A7B0C0]"><span>Оффер</span> <span class="text-white">${model.progressBars.offer}</span></div>
-      </div>
-
-      <!-- Утечка денег (Ошибки) -->
-      <div class="p-4 rounded-xl bg-[#FF4D4D]/10 border border-[#FF4D4D]/30 space-y-2.5">
-        <div class="text-xs font-bold text-[#FF4D4D] uppercase tracking-wider flex items-center gap-1.5">
-          ⚠️ УТЕЧКА ДЕНЕГ В ТЕКУЩЕЙ СИСТЕМЕ:
-        </div>
-        <div class="space-y-1.5">
-          ${leaksList}
+      <div class="memo">
+        <h3>Какой следующий шаг разумнее</h3>
+        <div class="decision-grid" id="decisionGrid">
+          <div class="decision ${decision === 'talk' ? 'active' : ''}" data-decision="talk"><strong>Переговоры</strong>Сначала закрыть спорные вопросы и только потом считать запуск.</div>
+          <div class="decision ${decision === 'pilot' ? 'active' : ''}" data-decision="pilot"><strong>Пилот</strong>Один небольшой продукт, ограниченный бюджет и точка пересмотра.</div>
+          <div class="decision ${decision === 'go' ? 'active' : ''}" data-decision="go"><strong>Запуск</strong>Можно идти дальше, но договорённости всё равно фиксируем письменно.</div>
         </div>
       </div>
 
-      <!-- Партнерская карта -->
-      <div class="space-y-2">
-        <div class="text-xs font-bold text-[#A7B0C0] uppercase tracking-wider">ПАРТНЁРСКАЯ КАРТА:</div>
-        <div class="p-3 rounded-xl bg-[#111827] border border-white/5 flex items-center justify-between text-[11px] font-bold text-white text-center gap-1">
-          <div class="bg-[#4F8CFF]/15 px-2 py-1.5 rounded-lg border border-[#4F8CFF]/30 flex-1 text-[#4F8CFF]">🌐 Трафик</div>
-          <span class="text-[#A7B0C0]">➔</span>
-          <div class="bg-[#4F8CFF]/15 px-2 py-1.5 rounded-lg border border-[#4F8CFF]/30 flex-1 text-[#4F8CFF]">🤝 Партнёр</div>
-          <span class="text-[#A7B0C0]">➔</span>
-          <div class="bg-[#4F8CFF]/15 px-2 py-1.5 rounded-lg border border-[#4F8CFF]/30 flex-1 text-[#4F8CFF]">🎁 Оффер</div>
-          <span class="text-[#A7B0C0]">➔</span>
-          <div class="bg-[#2EE59D]/15 px-2 py-1.5 rounded-lg border border-[#2EE59D]/30 flex-1 text-[#2EE59D]">💰 Деньги</div>
-        </div>
+      <div class="memo">
+        <h3>Ваши заметки</h3>
+        <div id="notesList" class="muted">${notesHtml}</div>
       </div>
 
-      <!-- Готовый план действий -->
-      <div class="space-y-2">
-        <div class="text-xs font-bold text-[#A7B0C0] uppercase tracking-wider">ПЛАН ДЕЙСТВИЙ:</div>
-        <div class="space-y-2">
-          ${actionsList}
-        </div>
-      </div>
-
-      <!-- CTA -->
-      <div class="pt-2">
-        <a href="https://t.me/" target="_blank" class="btn-saas-primary btn-saas-green btn-press text-center block text-decoration-none">
-          ЗАБРАТЬ ГОТОВУЮ СИСТЕМУ В ТЕЛЕГРАМ 🚀
-        </a>
+      <div class="actions">
+        <button class="secondary" id="restart-btn">Пройти заново</button>
+        <button class="primary" id="download-btn">Скачать переговорную шпаргалку</button>
       </div>
     </div>
   `;
 }
+
+export function downloadMemo(answers, notes) {
+  const res = calculateResult(answers);
+  const topics = res.risks.length ? res.risks : [7, 8, 9];
+
+  let text = `НЕ 50/50\nПереговорная шпаргалка по партнёрству\n\n`;
+  text += `РЕЗУЛЬТАТ\n${res.title}\n${res.lead}\nБаллы: ${res.score}/20\n\n`;
+  text += `РАЗГОВОРЫ, КОТОРЫЕ НУЖНО ПРОВЕСТИ\n`;
+
+  topics.forEach((k, i) => {
+    const d = topicDetails[k];
+    text += `\n${i + 1}. ${d.title}\n`;
+    text += `Почему важно: ${d.why}\n`;
+    text += `Что спросить:\n${d.ask.map(x => "— " + x).join("\n")}\n`;
+    text += `Что зафиксировать: ${d.fix}\n`;
+    text += `Начать можно так: ${d.start}\n`;
+  });
+
+  text += `\nМОИ ЗАМЕТКИ\n`;
+  const filled = Object.entries(notes).filter(([_, v]) => v.trim());
+  if (!filled.length) {
+    text += `Заметок нет. Значит, первый шаг — пройти вопросы вместе с партнёром.\n`;
+  } else {
+    filled.forEach(([k, v]) => {
+      text += `\n${topicMap[k]}:\n${v}\n`;
+    });
+  }
+
+  text += `\nГлавное: партнёрство вдолгую начинается не там, где вы во всём совпали, а там, где перестали совпадать — и всё-таки смогли договориться.\n`;
+
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "ne-50-50-peregovornaya-shpargalka.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+

@@ -1,0 +1,74 @@
+/* css/forms.css — Textareas, Inputs, and Diagnostic Insights */
+textarea, input[type="text"] {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 15px;
+  font: inherit;
+  color: var(--ink);
+  outline: none;
+}
+
+textarea:focus, input[type="text"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(187, 47, 42, .08);
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.insight {
+  display: none;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: var(--warn);
+  border: 1px solid #efd5a9;
+  line-height: 1.45;
+}
+
+.insight.show {
+  display: block;
+}
+
+.insight.good {
+  background: var(--good);
+  border-color: #c8ded1;
+}
+
+.insight.bad {
+  background: var(--bad);
+  border-color: #e7c5c0;
+}
+
+.field-wrap {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #faf7f0;
+  border: 1px dashed #cfc4b2;
+}
+
+.field-label {
+  display: block;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.field-help {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.optional {
+  font-weight: 700;
+  color: #8a7f6f;
+  font-size: 12px;
+  margin-left: 6px;
+}

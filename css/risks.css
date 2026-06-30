@@ -1,0 +1,140 @@
+/* css/risks.css — Risk Cards Accordion, Block and Microcopy Styling */
+.risk-stack {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.risk-card {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.risk-head {
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.risk-number {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bad);
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.risk-title {
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.risk-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.risk-toggle {
+  font-size: 24px;
+  line-height: 1;
+  color: var(--muted);
+  transition: transform .2s ease;
+}
+
+.risk-card.open .risk-toggle {
+  transform: rotate(45deg);
+}
+
+.risk-body {
+  display: none;
+  padding: 0 18px 18px 66px;
+}
+
+.risk-card.open .risk-body {
+  display: block;
+}
+
+.risk-block {
+  padding: 13px 14px;
+  border-radius: 14px;
+  margin-top: 10px;
+  line-height: 1.45;
+}
+
+.risk-block.why { background: #fff4e4; }
+.risk-block.ask { background: #eef4f2; }
+.risk-block.fix { background: #f1eef8; }
+.risk-block.start { background: #f8eeee; }
+.risk-block b {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.microcopy {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 20px 0;
+  padding: 18px 20px;
+  border: 1px dashed #b7aa95;
+  border-radius: 16px;
+  background: #fffaf1;
+}
+
+.fun-block {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: #e7f2ec;
+  border: 1px solid #c8ded1;
+  color: #23483f;
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+.fun-block::before {
+  content: "Наблюдение из взрослой жизни";
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: #4e756b;
+}
+
+.what-you-get {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.what-card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.what-card b {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+@media (max-width: 640px) {
+  .risk-body { padding-left: 18px; }
+  .what-you-get { grid-template-columns: 1fr; }
+}

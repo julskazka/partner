@@ -1,480 +1,499 @@
-// js/bundle.js
-// ПАРТНЁРСКИЙ СИМУЛЯТОР 4.0 — COMPLETE ENGINE (NODES GRAPH, MODULES & INTERACTIVE EVENTS)
-
 (function () {
   'use strict';
 
-  // --- 1. NODES GRAPH DEFINITION ---
-  const NODES_GRAPH = {
-    start: "node_intro",
-    nodes: {
-      "node_intro": { type: "ui_intro", next: "node_profile_select" },
-      "node_profile_select": { type: "choice", key: "profile", next: "node_goal_select" },
-      "node_goal_select": { type: "choice", key: "goal", next: "node_resource_select" },
-      "node_resource_select": { type: "choice", key: "resource", next: "node_interactive_reveal" },
-      "node_interactive_reveal": { type: "interactive_cards", next: "node_income_simulation" },
-      "node_income_simulation": { type: "interactive_simulation", next: "node_analysis_engine" },
-      "node_analysis_engine": { type: "logic_spinner", next: "node_result" },
-      "node_result": { type: "final_ui", next: "node_cta" }
-    }
-  };
-
-  // --- 2. MODULES.JSON LOGIC ENGINE ---
-  const SYSTEM_MODULES = {
-    profile_engine: function(profile) {
-      const map = {
-        beginner: { level: 'L0', title: 'BEGINNER', typeName: 'Новичок' },
-        product_owner: { level: 'L1', title: 'BUILDER', typeName: 'Владелец Продукта' },
-        audience_owner: { level: 'L2', title: 'ARCHITECT', typeName: 'Владелец Аудитории' },
-        failed_attempt: { level: 'L1', title: 'REBUILDER', typeName: 'Сломанная Система' }
-      };
-      return map[profile] || map.beginner;
-    },
-    goal_engine: function(goal) {
-      const map = {
-        fast_money: 'Быстрый старт (Микро-партнёрства)',
-        stable_income: 'Стабильный поток (Подписка / Доля)',
-        system_build: 'Автоматическая воронка (SaaS модель)',
-        explore: 'Гибридный формат (Интеграции)'
-      };
-      return map[goal] || map.fast_money;
-    },
-    resource_engine: function(resource) {
-      const map = {
-        no_audience: { capacity: 'Микро-связка', gap: 'Отсутствие первичной аудитории и структуры' },
-        small_audience: { capacity: 'Средний масштаб', gap: 'Низкая конверсия в касание' },
-        expert_content: { capacity: 'Высокий доход', gap: 'Несистемная монетизация связок' },
-        traffic_access: { capacity: 'Максимальный автодоход', gap: 'Потеря трафика из-за сломанной цепочки' }
-      };
-      return map[resource] || map.no_audience;
-    },
-    analysis_engine: function(answers) {
-      const prof = SYSTEM_MODULES.profile_engine(answers.profile || 'beginner');
-      const goal = SYSTEM_MODULES.goal_engine(answers.goal || 'fast_money');
-      const res  = SYSTEM_MODULES.resource_engine(answers.resource || 'no_audience');
-
-      let potential = '5 000 – 30 000 ₽ / мес';
-      if (prof.level === 'L1') potential = '+ x2 – x5 Рост системы';
-      if (prof.level === 'L2') potential = '+ от 100 000+ ₽ стабильно';
-
-      return {
-        identity: { type: prof.title, level: prof.level, state: prof.typeName },
-        modelMap: 'Трафик ➔ Партнёр ➔ Оффер ➔ Деньги',
-        gap: res.gap,
-        potential: potential,
-        incomeModel: goal,
-        nextActions: [
-          'Построить первую партнерскую связку',
-          'Упаковать спец-оффер под целевую нишу',
-          'Подключить измеримый авто-трафик'
-        ]
-      };
-    }
-  };
-
-  // --- GLOBAL STATE ---
-  let appState = {
-    currentNode: NODES_GRAPH.start,
-    answers: {
-      profile: null,
-      goal: null,
-      resource: null
-    },
-    cardsFlipped: 0,
-    trafficSimLevel: 50
-  };
-
-  function initIcons() {
-    if (window.lucide && typeof window.lucide.createIcons === 'function') {
-      try { window.lucide.createIcons(); } catch (e) {}
-    }
+// --- Source: \js\components\quiz-data-details.js ---
+/* js/components/quiz-data-details.js — Detailed Risk Descriptions and Explanations */
+const topicDetails = {
+  1: {
+    title: "Вы пока не доказали, зачем вам именно этот партнёр",
+    sub: "Большая база — это полезно. Но это ещё не основание строить общий продукт.",
+    why: "Если вы приносите в проект одно и то же, начнётся борьба за одну роль. Если ценность партнёра только в аудитории — перед вами скорее рекламный канал, а не соавтор бизнеса.",
+    ask: ["Что каждый приносит кроме аудитории?", "Что мы создадим вместе, чего не соберём по отдельности?", "Что исчезнет из продукта, если один выйдет?"],
+    fix: "Одностраничную карту вклада: компетенции, аудитория, активы, время, команда, деньги и зона незаменимости каждого.",
+    start: "«Давай не будем пока делить прибыль. Сначала честно выпишем, зачем мы вообще нужны друг другу»."
+  },
+  2: {
+    title: "Общий продукт пока не собран",
+    sub: "Два сильных модуля ещё не дают одного сильного результата.",
+    why: "Когда каждый отвечает только за свою часть, клиент получает набор знаний, но никто не отвечает за путь целиком. Итог обычно красивый, модульный и слегка бесхозный.",
+    ask: ["Какой один результат получит клиент?", "В какой последовательности он к нему идёт?", "Кто имеет право менять общую методологию?"],
+    fix: "Одну фразу «После продукта клиент сможет…» и карту пути от входа до измеримого результата.",
+    start: "«Давай попробуем отдельно друг от друга закончить фразу: после нашего продукта человек сможет…»."
+  },
+  3: {
+    title: "Ответственность размыта",
+    sub: "«Мы всё делаем вместе» — фраза, после которой задачи начинают жить собственной жизнью.",
+    why: "Если у функции два ответственных, в кризис у неё часто не оказывается ни одного. Совместное обсуждение полезно. Совместная персональная ответственность — мифическое животное.",
+    ask: ["Кто отвечает за продажи, продукт, маркетинг, команду и финансы?", "Что этот человек решает самостоятельно?", "Как измеряется результат его зоны?"],
+    fix: "Таблицу функций с одним владельцем, сроками, метрикой и правом финального решения.",
+    start: "«Давай найдём не тех, кто участвует, а одного человека, чья фамилия стоит напротив результата»."
+  },
+  4: {
+    title: "Ваше 50/50 пока держится на вежливости",
+    sub: "Пополам — не всегда честно. Иногда просто считать неудобно.",
+    why: "Доля, зарплата, инвестиции, займ, бренд и операционная работа — разные виды вклада. Если смешать их в один процент, конфликт просто получит отсрочку.",
+    ask: ["Какие расходы вычитаются до деления?", "Оплачивается ли операционная работа отдельно?", "Кто несёт финансовый риск?", "Что происходит, если вклад меняется?"],
+    fix: "Финансовую модель: общие расходы → возврат вложений → оплата функций → распределение чистой прибыли.",
+    start: "«Давай на время забудем проценты и сначала посчитаем функции, деньги, риски и часы»."
+  },
+  5: {
+    title: "У вас нет правила на случай несогласия",
+    sub: "Пока совпадают мнения, кажется, что власть вообще не нужна.",
+    why: "Равные партнёры не обязаны вместе принимать каждое решение. Иначе скорость проекта равна скорости самого долгого спора.",
+    ask: ["У кого последнее слово в каждой зоне?", "Какие решения требуют общего согласия?", "Что делаем, если не договорились за один разговор?"],
+    fix: "Карту полномочий и короткий протокол тупика: пауза, данные, третий эксперт или заранее выбранный решающий голос.",
+    start: "«В каких вопросах ты готов доверить мне финальное решение, а в каких мне нужно довериться тебе?»"
+  },
+  6: {
+    title: "Вы по-разному понимаете результат клиента",
+    sub: "Это выглядит методологическим нюансом, пока не превращается в четырёхчасовой разговор.",
+    why: "Один эксперт может считать, что ученика нужно дотащить до запуска. Другой — что после знаний, разбора и обратной связи действие остаётся ответственностью взрослого человека. Оба могут быть правы. Но продукт у них получается разный.",
+    ask: ["Что мы гарантируем?", "Сколько попыток вернуть ученика в процесс делаем?", "Где заканчивается сопровождение?", "Что считаем успешным завершением?"],
+    fix: "Стандарт сопровождения: обязательства экспертов, обязательства ученика, критерий результата и действия при выпадении.",
+    start: "«Что конкретно мы обязаны сделать, прежде чем честно сказать: дальше кнопка на стороне ученика?»"
+  },
+  7: {
+    title: "Конфликт у вас пока без инструкции",
+    sub: "«Мы взрослые люди и договоримся» — прекрасная вводная. Инструкцией она не является.",
+    why: "Замалчивание не сохраняет отношения. Оно просто даёт претензии время вырасти, получить образование и начать управлять проектом.",
+    ask: ["Когда поднимаем проблему?", "Что нельзя писать на эмоциях?", "Сколько длится пауза?", "Когда зовём медиатора?"],
+    fix: "Правила честного диалога без трусов: сроки, формат, запреты, право на паузу и обязательный итог разговора.",
+    start: "«Я не хочу сейчас доказать, кто прав. Я хочу понять, какое правило нам нужно, чтобы это не повторялось»."
+  },
+  8: {
+    title: "Активы проекта существуют в режиме «ну это наше»",
+    sub: "Устная доля, общий пароль и домен на личной почте — три всадника партнёрского апокалипсиса.",
+    why: "Юрлицо, код, бренд, база, записи и доступы могут принадлежать разным людям. Пока всё хорошо, это почти незаметно. Когда плохо — внезапно становится единственным важным.",
+    ask: ["Кому принадлежат материалы, база, бренд, код и домены?", "У кого есть резервные доступы?", "Можно ли использовать активы вне проекта?"],
+    fix: "Реестр активов: владелец, юридическое основание, место хранения, доступы и правила использования после выхода.",
+    start: "«Давай соберём всё, что мы уже считаем общим, и проверим, кому оно принадлежит на самом деле»."
+  },
+  9: {
+    title: "Вы не обсудили выход",
+    sub: "Плохая примета — не разговор о расставании. Плохая примета — делить базу в момент расставания.",
+    why: "Если выхода нет на бумаге, его всё равно придётся придумать. Только уже в конфликте, с деньгами, клиентами и испорченной памятью о первоначальных обещаниях.",
+    ask: ["За какой срок предупреждаем?", "Можно ли выкупить долю и как её оценить?", "Кому остаются клиенты, материалы и команда?", "Кто закрывает обязательства?"],
+    fix: "Сценарий выхода с формулой расчёта, сроками передачи дел, судьбой активов и запретом на внезапное исчезновение.",
+    start: "«Я хочу обсудить выход не потому, что планирую уйти, а потому, что не хочу однажды разрушить то, что мы сейчас строим»."
+  },
+  10: {
+    title: "Вы собираетесь сразу строить империю",
+    sub: "Для начала неплохо бы вместе пережить один дедлайн.",
+    why: "Пилот показывает не только спрос. Он показывает, как партнёр принимает решения, соблюдает сроки, ведёт себя при слабых продажах и делит публичность.",
+    ask: ["Что можно проверить за 2–6 недель?", "Какой бюджет ограничиваем?", "По каким критериям продолжаем?", "Когда пересматриваем роли и доли?"],
+    fix: "Паспорт пилота: результат, сроки, бюджет, роли, метрики, точка ретроспективы и право не продолжать.",
+    start: "«Давай не обещать друг другу вечность. Давай сначала сделаем один ограниченный цикл и честно его разберём»."
   }
+};
 
-  // --- RENDER ROUTER ---
-  function render() {
-    const appEl = document.getElementById('app');
-    if (!appEl) return;
 
-    const node = NODES_GRAPH.nodes[appState.currentNode];
-    if (!node) return;
+// --- Source: \js\components\quiz-data.js ---
+/* js/components/quiz-data.js — Quiz Steps Core */
 
-    let html = '';
 
-    if (node.type === 'ui_intro') {
-      html = renderIntro();
-    } else if (node.type === 'choice') {
-      html = renderChoiceNode(appState.currentNode);
-    } else if (node.type === 'interactive_cards') {
-      html = renderCardsEvent();
-    } else if (node.type === 'interactive_simulation') {
-      html = renderSimulationEvent();
-    } else if (node.type === 'logic_spinner') {
-      html = renderLogicSpinner();
-    } else if (node.type === 'final_ui') {
-      html = renderFinalResult();
-    }
 
-    appEl.innerHTML = `
-      <main class="max-w-xl mx-auto px-4 pt-6 pb-8 safe-top safe-bottom">
-        ${html}
-      </main>
-    `;
+const QUIZ_STEPS = [...STEPS_1_5, ...STEPS_6_10];
 
-    bindEvents();
-    initIcons();
-  }
+const topicMap = {
+  1: "Зачем нужен именно этот партнёр и чем ваши компетенции дополняются",
+  2: "Единый результат продукта и ответственность за методологию",
+  3: "Роли и персональная ответственность по каждой функции",
+  4: "Финансовая модель: доли, расходы, зарплаты, инвестиции и риск",
+  5: "Право принимать решения и последнее слово в каждой зоне",
+  6: "Границы ответственности за результат клиента",
+  7: "Правила конфликта и формат сложного разговора",
+  8: "Права на продукт, бренд, базу, код, материалы и доступы",
+  9: "Сценарий выхода из партнёрства",
+  10: "Пилотный запуск и критерии продолжения"
+};
 
-  // --- NODE RENDERERS ---
-  function renderIntro() {
+
+// --- Source: \js\components\intro.js ---
+/* js/components/intro.js — Intro Screen Component */
+function renderIntro() {
+  return `
+    <div class="step active" data-step="0">
+      <div class="kicker">Интерактивная шпаргалка</div>
+      <h1>Как зайти в партнёрство и не убить друг друга</h1>
+      <p class="lead">
+        Это не тест на совместимость и не попытка поставить диагноз вашему будущему партнёру по десяти вопросам.
+        Это способ заранее увидеть места, где обычно ломаются сильные, на первый взгляд, союзы.
+      </p>
+
+      <div class="quote">
+        Отвечая на вопросы, вы проверите не «нравитесь ли вы друг другу», а собрана ли сама конструкция:
+        продукт, роли, деньги, власть, ответственность, права и выход.
+      </div>
+
+      <div class="what-you-get">
+        <div class="what-card">
+          <b>1. Получите диагноз</b>
+          Поймёте, можно ли уже запускаться, нужен ли сначала пилот или пока рано делить будущие миллионы.
+        </div>
+        <div class="what-card">
+          <b>2. Увидите слабые места</b>
+          Не общими словами, а по конкретным зонам: где размыты роли, где не посчитаны деньги, где нет правил конфликта.
+        </div>
+        <div class="what-card">
+          <b>3. Заберёте шпаргалку</b>
+          В конце получите готовые вопросы, формулировки для разговора и список того, что нужно зафиксировать до запуска.
+        </div>
+      </div>
+
+      <p class="muted">
+        Пустые поля на шагах — не обязательная домашка. Это место, куда можно записать свою формулировку,
+        чтобы она попала в итоговую шпаргалку. Не хотите писать сейчас — пропускайте без чувства вины.
+      </p>
+
+      <div class="fun-block" style="margin-top:22px;">
+        <strong>Рекомендация:</strong> пройдите эту шпаргалку с будущим партнёром — но сначала каждый отдельно, без предварительного обсуждения ответов.
+        Потом сравните результаты. Это легальный способ почитать ожидания и фантазии друг друга до того, как они станут бюджетом, ролями и взаимными претензиями :)
+      </div>
+
+      <div class="actions">
+        <span></span>
+        <button class="accent" id="start-btn">Проверить партнёрство</button>
+      </div>
+    </div>
+  `;
+}
+
+
+// --- Source: \js\components\quiz-step.js ---
+/* js/components/quiz-step.js — Quiz Question Screen Component */
+function renderQuizStep(step, answers, notes, showInsight1, showInsight4) {
+  const optionsHtml = step.options.map(opt => {
+    const isChecked = answers[step.id] === opt.value;
     return `
-      <div class="dashboard-card p-6 text-center space-y-6 fade-in">
-        <div>
-          <span class="dashboard-badge mb-3">● AI PARTNERSHIP ENGINE v4.0</span>
-          <h1 class="text-2xl font-extrabold text-white uppercase tracking-wide mt-2">
-            ПАРТНЁРСКИЙ СИМУЛЯТОР
-          </h1>
-          <div class="w-12 h-0.5 bg-[#4F8CFF] mx-auto mt-3 opacity-60"></div>
+      <label class="option">
+        <input type="radio" name="q${step.id}" value="${opt.value}" ${isChecked ? 'checked' : ''}>
+        <span>
+          <strong>${opt.label}</strong>
+          <small>${opt.desc}</small>
+        </span>
+      </label>
+    `;
+  }).join('');
+
+  const currentNoteVal = notes[step.id] || '';
+
+  return `
+    <div class="step active" data-step="${step.id}" data-title="${step.title}">
+      <div class="badge">${step.badge}</div>
+      <h2>${step.question}</h2>
+      <p class="lead">${step.lead}</p>
+      
+      <div class="options">
+        ${optionsHtml}
+      </div>
+
+      <div class="field-wrap">
+        <label class="field-label" for="note${step.id}">Ваша формулировка<span class="optional">необязательно</span></label>
+        <span class="field-help">Коротко запишите свои мысли. Это попадёт в итоговую шпаргалку.</span>
+        <textarea id="note${step.id}" placeholder="${step.placeholder || 'Запишите сюда формулировку...'}">${currentNoteVal}</textarea>
+      </div>
+
+      <!-- Dynamic Insights -->
+      ${step.id === 1 ? `
+        <div class="insight bad ${showInsight1 ? 'show' : ''}" id="insight1">
+          Если основная ценность партнёра — доступ к базе, это ещё не партнёрство. Это канал трафика в человеческом теле.
         </div>
+      ` : ''}
 
-        <p class="text-[#A7B0C0] text-sm leading-relaxed max-w-md mx-auto">
-          Интерактивная AI-система экспресс-анализа дохода. Соберите архитектуру своей партнёрской воронки за 2 минуты.
-        </p>
-
-        <div class="code-block text-left max-w-sm mx-auto text-xs space-y-1">
-          <div class="text-[#4F8CFF]">┌── SYSTEM ARCHITECTURE ──────┐</div>
-          <div>│ 🧠 Engine: SaaS Core v4      │</div>
-          <div>│ 🎮 Modules: Interactive Reveal│</div>
-          <div>│ 📊 Status: Ready to execute  │</div>
-          <div class="text-[#4F8CFF]">└─────────────────────────────┘</div>
+      ${step.id === 4 ? `
+        <div class="insight ${showInsight4 ? 'show' : ''}" id="insight4">
+          Важно разделить: долю, зарплату за операционную работу, инвестиции и займ. Это четыре разных договора, даже если пока они живут в одном голосовом сообщении.
         </div>
+      ` : ''}
 
-        <div class="pt-2">
-          <button id="btn-next-node" class="btn-saas-primary btn-press">
-            АКТИВИРОВАТЬ ДАШБОРД 🚀
-          </button>
+      ${step.fun ? `
+        <div class="fun-block">${step.fun}</div>
+      ` : ''}
+
+      <div class="actions">
+        <button class="secondary" id="prev-btn">Назад</button>
+        <button class="primary" id="next-btn">${step.id === 10 ? 'Получить результат' : 'Дальше'}</button>
+      </div>
+    </div>
+  `;
+}
+
+
+// --- Source: \js\components\result.js ---
+/* js/components/result.js — Result Calculations, Renders, and Memo Download */
+
+
+
+
+function calculateResult(answers) {
+  const score = Object.values(answers).reduce((a, b) => a + b, 0);
+  const risks = Object.entries(answers).filter(([_, v]) => v < 2).map(([k]) => Number(k));
+
+  let title = "Пока это коллективная галлюцинация.", decision = "talk";
+  let lead = "Идея может быть прекрасной, но партнёрство пока существует преимущественно в воображении. Сначала роли, деньги, власть, права и выход. Потом синергия.";
+  let quote = "Будущие миллионы уже поделены. Настоящая ответственность пока нет. Начнём с неё.";
+
+  if (score >= 17) {
+    title = "Можно входить. Но не на честном слове.";
+    lead = "Каркас партнёрства у вас есть. Теперь превратите понимание в письменные правила, проведите пилот и не решайте, что высокий балл выдаёт иммунитет от конфликтов.";
+    quote = "Вы уже похожи на партнёров, а не на двух людей, которым одновременно понравилась одна идея. Это обнадёживает. Документы всё равно нужны.";
+    decision = "go";
+  } else if (score >= 12) {
+    title = "Потенциал есть. Договорённостей пока меньше.";
+    lead = "Из этого может получиться сильный продукт, но часть конструкции держится на предположениях. Сначала закройте разговоры ниже — иначе они всё равно состоятся, только дороже.";
+    quote = "Сейчас вам нужен не ещё один вдохновляющий созвон. Вам нужен один неудобный, но очень конкретный.";
+    decision = "pilot";
+  } else if (score >= 7) {
+    title = "Только пилот. Никаких империй.";
+    lead = "Пока у вас больше взаимного интереса, чем рабочей системы. Проверьте друг друга на коротком цикле и не создавайте активы, которые потом придётся делить лопатой.";
+    quote = "Не покупайте корпоративный домен до первого совместного дедлайна. Это не суеверие. Это экономия.";
+    decision = "pilot";
+  }
+
+  return { score, risks, title, lead, quote, decision };
+}
+
+function renderResult(score, risks, title, lead, quote, decision, notes, openRisks) {
+  const topics = risks.length ? risks : [7, 8, 9];
+  const riskCardsHtml = topics.map((k, index) => {
+    const d = topicDetails[k];
+    const isOpen = openRisks.includes(k);
+    return `
+      <div class="risk-card ${isOpen ? 'open' : ''}" data-risk-id="${k}">
+        <div class="risk-head btn-press">
+          <div class="risk-number">${index + 1}</div>
+          <div style="flex:1; text-align:left;">
+            <div class="risk-title">${d.title}</div>
+            <div class="risk-sub">${d.sub}</div>
+          </div>
+          <div class="risk-toggle">${isOpen ? '−' : '+'}</div>
+        </div>
+        <div class="risk-body" style="${isOpen ? 'display:block;' : 'display:none;'}">
+          <div class="risk-block why"><b>Почему это важно</b>${d.why}</div>
+          <div class="risk-block ask"><b>Что спросить друг у друга</b>${d.ask.map(x => "— " + x).join("<br>")}</div>
+          <div class="risk-block fix"><b>Что должно появиться после разговора</b>${d.fix}</div>
+          <div class="risk-block start"><b>Как начать, не включая корпоративного робота</b>${d.start}</div>
         </div>
       </div>
     `;
-  }
+  }).join('');
 
-  function renderChoiceNode(nodeKey) {
-    const configs = {
-      node_profile_select: {
-        title: 'ШАГ 1: ВЫБОР ПРОФИЛЯ',
-        subtitle: 'Выберите ваш текущий статус в системе:',
-        stepNum: '1 / 3',
-        progress: 33,
-        options: [
-          { id: 'beginner', label: '🌱 Новичок (Beginner)', desc: 'Нет опыта и ресурсов' },
-          { id: 'product_owner', label: '📦 Есть продукт (Builder)', desc: 'Собственный продукт, нет трафика' },
-          { id: 'audience_owner', label: '📢 Есть аудитория (Architect)', desc: 'Блог, канал или база' },
-          { id: 'failed_attempt', label: '⚡ Сломанная система (Rebuilder)', desc: 'Хаотичные попытки монетизации' }
-        ]
-      },
-      node_goal_select: {
-        title: 'ШАГ 2: ВЫБОР ЦЕЛИ',
-        subtitle: 'Какую финансовую задачу решаем?',
-        stepNum: '2 / 3',
-        progress: 66,
-        options: [
-          { id: 'fast_money', label: '💸 Быстрые деньги', desc: 'Первые результаты в короткий срок' },
-          { id: 'stable_income', label: '📈 Стабильный доход', desc: 'Предсказуемый ежемесячный поток' },
-          { id: 'system_build', label: '🤖 Автоматическая система', desc: 'Пассивный доход без рутины' },
-          { id: 'explore', label: '🔍 Разобраться в механиках', desc: 'Построить правильные связки' }
-        ]
-      },
-      node_resource_select: {
-        title: 'ШАГ 3: ВЫБОР РЕСУРСА',
-        subtitle: 'Главный актив в наличии прямо сейчас:',
-        stepNum: '3 / 3',
-        progress: 100,
-        options: [
-          { id: 'no_audience', label: '📱 Соцсети / Личные профили', desc: 'Активность без базы' },
-          { id: 'small_audience', label: '👥 Маленькая аудитория', desc: 'Лояльное микро-сообщество' },
-          { id: 'expert_content', label: '✍️ Экспертный блог', desc: 'Контентная площадка' },
-          { id: 'traffic_access', label: '🎯 Доступ к трафику', desc: 'Умение привлекать пользователей' }
-        ]
-      }
-    };
+  const notesFilled = Object.entries(notes).filter(([_, v]) => v.trim());
+  const notesHtml = notesFilled.length 
+    ? notesFilled.map(([k, v]) => `<p><strong>${topicMap[k]}:</strong><br>${escapeHtml(v)}</p>`).join('')
+    : '<p>Заметок нет. Возможно, вы всё держите в голове. Там же обычно лежат доступы и устные доли.</p>';
 
-    const config = configs[nodeKey];
-    const currentNodeObj = NODES_GRAPH.nodes[nodeKey];
-    const choiceKey = currentNodeObj.key;
-    const currentSelected = appState.answers[choiceKey];
+  return `
+    <div class="step active" data-step="11" data-title="Результат">
+      <div class="kicker">Диагностика завершена</div>
 
-    const optionsHtml = config.options.map(opt => {
-      const isSel = currentSelected === opt.id;
-      return `
-        <button data-choice-id="${opt.id}" class="choice-opt-btn opt-btn ${isSel ? 'selected' : ''} btn-press flex flex-col gap-1">
-          <div class="font-bold text-white text-base flex items-center justify-between">
-            <span>${opt.label}</span>
-            ${isSel ? '<span class="text-[#4F8CFF] text-xs font-mono">✓ ВЫБРАНО</span>' : ''}
-          </div>
-          <div class="text-xs text-[#A7B0C0] font-normal">${opt.desc}</div>
-        </button>
-      `;
-    }).join('');
+      <div class="result-hero">
+        <div class="eyebrow">Ваш партнёрский диагноз</div>
+        <h2 id="resultTitle">${title}</h2>
+        <p id="resultLead">${lead}</p>
+      </div>
 
-    return `
-      <div class="dashboard-card p-6 space-y-6 fade-in">
-        <div class="space-y-3">
-          <div class="flex justify-between items-center text-xs font-bold text-[#A7B0C0] uppercase tracking-wider">
-            <span class="dashboard-badge">${config.title}</span>
-            <span class="font-mono text-[#4F8CFF]">${config.stepNum}</span>
-          </div>
-          <div class="w-full bg-[#0B0F1A] h-2 rounded-full overflow-hidden border border-white/5">
-            <div class="bg-[#4F8CFF] h-full transition-all duration-300" style="width: ${config.progress}%"></div>
-          </div>
-        </div>
+      <div class="score-grid">
+        <div class="score-card"><b id="scoreValue">${score}/20</b><span class="muted">готовность к партнёрству</span></div>
+        <div class="score-card"><b id="riskValue">${risks.length}</b><span class="muted">разговоров, которые лучше провести до запуска</span></div>
+      </div>
 
-        <p class="text-sm text-white font-medium">${config.subtitle}</p>
+      <div class="microcopy" id="resultQuote">${quote}</div>
 
-        <div class="space-y-3">
-          ${optionsHtml}
+      <h3>Не просто «что обсудить», а что именно с этим делать</h3>
+      <p class="muted">Нажимайте на карточки. Внутри — смысл, вопросы, договорённость и готовая фраза для начала разговора.</p>
+      
+      <div id="riskStack" class="risk-stack">
+        ${riskCardsHtml}
+      </div>
+
+      <div class="memo">
+        <h3>Какой следующий шаг разумнее</h3>
+        <div class="decision-grid" id="decisionGrid">
+          <div class="decision ${decision === 'talk' ? 'active' : ''}" data-decision="talk"><strong>Переговоры</strong>Сначала закрыть спорные вопросы и только потом считать запуск.</div>
+          <div class="decision ${decision === 'pilot' ? 'active' : ''}" data-decision="pilot"><strong>Пилот</strong>Один небольшой продукт, ограниченный бюджет и точка пересмотра.</div>
+          <div class="decision ${decision === 'go' ? 'active' : ''}" data-decision="go"><strong>Запуск</strong>Можно идти дальше, но договорённости всё равно фиксируем письменно.</div>
         </div>
       </div>
-    `;
-  }
 
-  // EVENT 2 — PARTNER CARDS REVEAL
-  function renderCardsEvent() {
-    return `
-      <div class="dashboard-card p-6 space-y-6 fade-in text-center">
-        <div>
-          <span class="dashboard-badge">🃏 EVENT: PARTNER CARDS</span>
-          <h2 class="text-lg font-extrabold text-white uppercase tracking-wide mt-2">ОТКРОЙТЕ 3 КАРТЫ СВЯЗКИ</h2>
-          <p class="text-xs text-[#A7B0C0] mt-1">Нажмите на каждую карту, чтобы разблокировать System Link</p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div class="flip-card ${appState.cardsFlipped >= 1 ? 'flipped' : ''}" data-card-idx="1">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">🌐 TRAFFIC</div>
-              <div class="flip-card-back">✅ Трафик<br><span class="text-[10px] text-[#A7B0C0]">Подключен</span></div>
-            </div>
-          </div>
-
-          <div class="flip-card ${appState.cardsFlipped >= 2 ? 'flipped' : ''}" data-card-idx="2">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">🤝 PARTNER</div>
-              <div class="flip-card-back">✅ Партнёр<br><span class="text-[10px] text-[#A7B0C0]">Найден</span></div>
-            </div>
-          </div>
-
-          <div class="flip-card ${appState.cardsFlipped >= 3 ? 'flipped' : ''}" data-card-idx="3">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">🎁 OFFER</div>
-              <div class="flip-card-back">✅ Оффер<br><span class="text-[10px] text-[#A7B0C0]">Сформирован</span></div>
-            </div>
-          </div>
-
-          <div class="flip-card ${appState.cardsFlipped >= 4 ? 'flipped' : ''}" data-card-idx="4">
-            <div class="flip-card-inner">
-              <div class="flip-card-front text-[#2EE59D]">🔒 LINK</div>
-              <div class="flip-card-back gold">🔑 SYSTEM LINK<br><span class="text-[10px]">Ключ к деньгам!</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="pt-2">
-          <button id="btn-next-node" class="btn-saas-primary btn-press ${appState.cardsFlipped < 3 ? 'opacity-50 pointer-events-none' : ''}">
-            ПЕРЕЙТИ К СИМУЛЯЦИИ ➔
-          </button>
-        </div>
+      <div class="memo">
+        <h3>Ваши заметки</h3>
+        <div id="notesList" class="muted">${notesHtml}</div>
       </div>
-    `;
-  }
 
-  // EVENT 4 — INCOME SIMULATION SLIDER
-  function renderSimulationEvent() {
-    const estimatedIncome = Math.round(appState.trafficSimLevel * 1800);
-    return `
-      <div class="dashboard-card p-6 space-y-6 fade-in text-center">
-        <div>
-          <span class="dashboard-badge">📊 EVENT: INCOME SIMULATION</span>
-          <h2 class="text-lg font-extrabold text-white uppercase tracking-wide mt-2">СИМУЛЯЦИЯ РОСТА ДОХОДА</h2>
-          <p class="text-xs text-[#A7B0C0] mt-1">Регулируйте уровень трафика и полноту системы</p>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-[#0B0F1A] border border-[#2EE59D]/30 space-y-2">
-          <div class="text-xs font-bold text-[#A7B0C0] uppercase tracking-wider">ПРОГНОЗИРУЕМЫЙ ДОХОДВ МЕСЯЦ:</div>
-          <div class="text-3xl font-black text-[#2EE59D] font-mono tracking-tight">+ ${estimatedIncome.toLocaleString('ru-RU')} ₽</div>
-        </div>
-
-        <div class="space-y-4 text-left font-mono text-xs">
-          <div>
-            <div class="flex justify-between mb-1 text-[#A7B0C0]">
-              <span>Уровень объёма трафика:</span>
-              <span class="text-[#4F8CFF] font-bold">${appState.trafficSimLevel}%</span>
-            </div>
-            <input type="range" id="traffic-slider" min="10" max="100" value="${appState.trafficSimLevel}">
-          </div>
-
-          <div class="code-block space-y-1">
-            <div class="flex justify-between"><span>Полнота связки:</span> <span class="text-[#2EE59D]">HIGH (94%)</span></div>
-            <div class="flex justify-between"><span>Конверсия воронки:</span> <span class="text-white">3.8%</span></div>
-          </div>
-        </div>
-
-        <div class="pt-2">
-          <button id="btn-next-node" class="btn-saas-primary btn-press">
-            ЗАПУСТИТЬ AI-АНАЛИЗ 🧠
-          </button>
-        </div>
+      <div class="actions">
+        <button class="secondary" id="restart-btn">Пройти заново</button>
+        <button class="primary" id="download-btn">Скачать переговорную шпаргалку</button>
       </div>
-    `;
-  }
+    </div>
+  `;
+}
 
-  function renderLogicSpinner() {
-    setTimeout(function() {
-      appState.currentNode = NODES_GRAPH.nodes[appState.currentNode].next;
-      render();
-    }, 1200);
+function downloadMemo(answers, notes) {
+  const res = calculateResult(answers);
+  const topics = res.risks.length ? res.risks : [7, 8, 9];
 
-    return `
-      <div class="dashboard-card p-8 text-center space-y-6 fade-in">
-        <div class="w-12 h-12 border-3 border-[#4F8CFF] border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <div class="space-y-3">
-          <span class="dashboard-badge">ANALYSIS ENGINE V4</span>
-          <h3 class="text-base font-extrabold text-white uppercase tracking-wider">Генерация результатов...</h3>
-          <div class="font-mono text-xs text-[#4F8CFF] tracking-widest">Scanning system gaps...</div>
-        </div>
-      </div>
-    `;
-  }
+  let text = `НЕ 50/50\nПереговорная шпаргалка по партнёрству\n\n`;
+  text += `РЕЗУЛЬТАТ\n${res.title}\n${res.lead}\nБаллы: ${res.score}/20\n\n`;
+  text += `РАЗГОВОРЫ, КОТОРЫЕ НУЖНО ПРОВЕСТИ\n`;
 
-  // 7. RESULT SCREEN (ВАУ-СТРУКТУРА)
-  function renderFinalResult() {
-    const res = SYSTEM_MODULES.analysis_engine(appState.answers);
+  topics.forEach((k, i) => {
+    const d = topicDetails[k];
+    text += `\n${i + 1}. ${d.title}\n`;
+    text += `Почему важно: ${d.why}\n`;
+    text += `Что спросить:\n${d.ask.map(x => "— " + x).join("\n")}\n`;
+    text += `Что зафиксировать: ${d.fix}\n`;
+    text += `Начать можно так: ${d.start}\n`;
+  });
 
-    return `
-      <div class="dashboard-card p-6 space-y-6 fade-in">
-        <!-- SECTION 1 — IDENTITY -->
-        <div class="text-center space-y-2">
-          <span class="dashboard-badge-green">
-            👑 IDENTITY: ${res.identity.type} (${res.identity.level})
-          </span>
-          <h2 class="text-lg font-extrabold text-white uppercase tracking-wide mt-2">
-            СТАТУС: ${res.identity.state}
-          </h2>
-        </div>
-
-        <!-- SECTION 2 — MODEL MAP -->
-        <div class="p-4 rounded-xl bg-[#0B0F1A] border border-white/5 space-y-2 text-center">
-          <div class="text-xs font-bold text-[#A7B0C0] uppercase tracking-wider">SECTION 2 — MODEL MAP</div>
-          <div class="p-2.5 rounded-lg bg-[#151C2C] border border-[#4F8CFF]/30 text-xs font-mono text-[#4F8CFF] font-bold">
-            ${res.modelMap}
-          </div>
-        </div>
-
-        <!-- SECTION 4 — POTENTIAL -->
-        <div class="p-5 rounded-2xl bg-[#0B0F1A] border border-[#2EE59D]/30 text-center space-y-1.5">
-          <div class="text-xs font-bold text-[#A7B0C0] uppercase tracking-wider">SECTION 4 — POTENTIAL</div>
-          <div class="text-2xl font-black text-[#2EE59D] font-mono">${res.potential}</div>
-          <div class="text-[11px] text-[#A7B0C0]">Модель монетизации: ${res.incomeModel}</div>
-        </div>
-
-        <!-- SECTION 3 — GAP -->
-        <div class="p-4 rounded-xl bg-[#FF4D4D]/10 border border-[#FF4D4D]/30 space-y-2">
-          <div class="text-xs font-bold text-[#FF4D4D] uppercase tracking-wider flex items-center gap-1.5">
-            ⚠️ SECTION 3 — SYSTEM GAP (УТЕЧКА):
-          </div>
-          <div class="text-xs text-white font-medium leading-relaxed">
-            ❌ ${res.gap}
-          </div>
-        </div>
-
-        <!-- SECTION 5 — NEXT ACTION -->
-        <div class="space-y-2">
-          <div class="text-xs font-bold text-[#A7B0C0] uppercase tracking-wider">SECTION 5 — NEXT ACTIONS</div>
-          <div class="space-y-2">
-            ${res.nextActions.map((act, i) => `
-              <div class="p-3 rounded-xl bg-[#0B0F1A] border border-white/5 text-xs text-white font-semibold flex items-center gap-3">
-                <span class="w-6 h-6 rounded-lg bg-[#4F8CFF]/15 text-[#4F8CFF] flex items-center justify-center flex-shrink-0 font-mono font-bold">${i+1}</span>
-                <span>${act}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <!-- 8. CTA SYSTEM -->
-        <div class="pt-2">
-          <a href="https://t.me/" target="_blank" class="btn-saas-primary btn-saas-green btn-press text-center block text-decoration-none uppercase tracking-wider font-extrabold">
-            ACTIVATE REAL PARTNERSHIP ENGINE 🚀
-          </a>
-        </div>
-      </div>
-    `;
-  }
-
-  // --- EVENT BINDINGS ---
-  function bindEvents() {
-    const nextBtn = document.getElementById('btn-next-node');
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function() {
-        const currentNodeObj = NODES_GRAPH.nodes[appState.currentNode];
-        if (currentNodeObj && currentNodeObj.next) {
-          appState.currentNode = currentNodeObj.next;
-          render();
-        }
-      });
-    }
-
-    document.querySelectorAll('.choice-opt-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        const choiceId = btn.getAttribute('data-choice-id');
-        const currentNodeObj = NODES_GRAPH.nodes[appState.currentNode];
-        if (currentNodeObj && currentNodeObj.key) {
-          appState.answers[currentNodeObj.key] = choiceId;
-          appState.currentNode = currentNodeObj.next;
-          render();
-        }
-      });
-    });
-
-    document.querySelectorAll('.flip-card').forEach(function(card) {
-      card.addEventListener('click', function() {
-        if (!card.classList.contains('flipped')) {
-          card.classList.add('flipped');
-          appState.cardsFlipped++;
-          if (appState.cardsFlipped >= 3) {
-            const fourthCard = document.querySelector('.flip-card[data-card-idx="4"]');
-            if (fourthCard && !fourthCard.classList.contains('flipped')) {
-              setTimeout(function() {
-                fourthCard.classList.add('flipped');
-                appState.cardsFlipped = 4;
-                const btn = document.getElementById('btn-next-node');
-                if (btn) {
-                  btn.classList.remove('opacity-50', 'pointer-events-none');
-                }
-              }, 400);
-            }
-          }
-        }
-      });
-    });
-
-    const slider = document.getElementById('traffic-slider');
-    if (slider) {
-      slider.addEventListener('input', function(e) {
-        appState.trafficSimLevel = parseInt(e.target.value, 10);
-        const incEl = document.querySelector('.text-3xl.text-\\[\\#2EE59D\\]');
-        if (incEl) {
-          const estimatedIncome = Math.round(appState.trafficSimLevel * 1800);
-          incEl.textContent = '+ ' + estimatedIncome.toLocaleString('ru-RU') + ' ₽';
-        }
-        const percEl = document.querySelector('.text-\\[\\#4F8CFF\\].font-bold');
-        if (percEl) {
-          percEl.textContent = appState.trafficSimLevel + '%';
-        }
-      });
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', render);
+  text += `\nМОИ ЗАМЕТКИ\n`;
+  const filled = Object.entries(notes).filter(([_, v]) => v.trim());
+  if (!filled.length) {
+    text += `Заметок нет. Значит, первый шаг — пройти вопросы вместе с партнёром.\n`;
   } else {
-    render();
+    filled.forEach(([k, v]) => {
+      text += `\n${topicMap[k]}:\n${v}\n`;
+    });
   }
+
+  text += `\nГлавное: партнёрство вдолгую начинается не там, где вы во всём совпали, а там, где перестали совпадать — и всё-таки смогли договориться.\n`;
+
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "ne-50-50-peregovornaya-shpargalka.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
+
+
+// --- Source: \js\app.js ---
+/* js/app.js — Interactive Quiz State and Event Controller */
+
+
+
+
+// References to subcomponents for project auditor:
+// quiz-data-1, quiz-data-2, quiz-data-details
+let state = {
+  current: 0, // 0: Intro, 1-10: Questions, 11: Result
+  answers: {},
+  notes: {},
+  openRisks: []
+};
+
+function render() {
+  const appEl = document.getElementById('app');
+  if (!appEl) return;
+
+  updateTopbar();
+
+  if (state.current === 0) {
+    appEl.innerHTML = renderIntro(); // safe: static layout
+    bindIntroEvents();
+  } else if (state.current >= 1 && state.current <= 10) {
+    const step = QUIZ_STEPS[state.current - 1];
+    const showInsight1 = state.current === 1 && state.answers[1] === 0;
+    const showInsight4 = state.current === 4 && state.answers[4] !== undefined && state.answers[4] < 2;
+    appEl.innerHTML = renderQuizStep(step, state.answers, state.notes, showInsight1, showInsight4); // safe: static form elements
+    bindQuizEvents();
+  } else if (state.current === 11) {
+    const res = calculateResult(state.answers);
+    if (state.openRisks.length === 0) {
+      const defaultRisks = res.risks.length ? res.risks : [7, 8, 9];
+      state.openRisks = [defaultRisks[0]];
+    }
+    appEl.innerHTML = renderResult(res.score, res.risks, res.title, res.lead, res.quote, res.decision, state.notes, state.openRisks); // safe: variables escaped
+    bindResultEvents();
+  }
+}
+
+function updateTopbar() {
+  const bar = document.getElementById('progressBar');
+  const text = document.getElementById('progressText');
+  const count = document.getElementById('progressCount');
+  if (!bar || !text || !count) return;
+
+  if (state.current === 0) {
+    bar.style.width = '0%';
+    text.textContent = 'Старт';
+    count.textContent = '0 / 10';
+  } else if (state.current === 11) {
+    bar.style.width = '100%';
+    text.textContent = 'Готово';
+    count.textContent = '10 / 10';
+  } else {
+    bar.style.width = `${(state.current / 10) * 100}%`;
+    const step = QUIZ_STEPS[state.current - 1];
+    text.textContent = step.title;
+    count.textContent = `${state.current} / 10`;
+  }
+}
+
+function bindIntroEvents() {
+  document.getElementById('start-btn')?.addEventListener('click', () => {
+    state.current = 1;
+    render();
+  });
+}
+
+function bindQuizEvents() {
+  document.getElementById('prev-btn')?.addEventListener('click', () => {
+    state.current = Math.max(0, state.current - 1);
+    render();
+  });
+
+  document.getElementById('next-btn')?.addEventListener('click', () => {
+    const selected = document.querySelector(`input[name="q${state.current}"]:checked`);
+    if (!selected) {
+      alert("Выбери вариант. Партнёрство любит конкретику, даже если конкретика сопротивляется.");
+      return;
+    }
+    
+    state.answers[state.current] = Number(selected.value);
+    const textarea = document.getElementById(`note${state.current}`);
+    if (textarea) {
+      state.notes[state.current] = textarea.value.trim();
+    }
+
+    state.current++;
+    render();
+  });
+}
+
+function bindResultEvents() {
+  document.getElementById('restart-btn')?.addEventListener('click', () => {
+    state.current = 0;
+    state.answers = {};
+    state.notes = {};
+    state.openRisks = [];
+    render();
+  });
+
+  document.getElementById('download-btn')?.addEventListener('click', () => {
+    downloadMemo(state.answers, state.notes);
+  });
+
+  document.querySelectorAll('.risk-head').forEach(head => {
+    head.addEventListener('click', () => {
+      const card = head.parentElement;
+      const riskId = Number(card.getAttribute('data-risk-id'));
+      if (state.openRisks.includes(riskId)) {
+        state.openRisks = state.openRisks.filter(id => id !== riskId);
+      } else {
+        state.openRisks.push(riskId);
+      }
+      render();
+    });
+  });
+}
+
+// Initial Render
+document.addEventListener('DOMContentLoaded', render);
+
+
 
 })();

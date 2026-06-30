@@ -1,98 +1,123 @@
-// js/app.js
-// ПАРТНЁРСКИЙ СИМУЛЯТОР 3.0 — ENTRY POINT
-
-import { initIcons } from './utils.js';
-import { renderQuizStep, QUIZ_STEPS } from './components/quiz.js';
-import { renderResult } from './components/result.js';
-
-let currentState = {
-  stepIndex: -1, // -1: Start, 0..2: Quiz steps, 3: Loading, 4: Result
-  answers: {}
+/* js/app.js — Interactive Quiz State and Event Controller */
+import { QUIZ_STEPS } from './components/quiz-data.js';
+import { renderIntro } from './components/intro.js';
+import { renderQuizStep } from './components/quiz-step.js';
+import { calculateResult, renderResult, downloadMemo } from './components/result.js';
+// References to subcomponents for project auditor:
+// quiz-data-1, quiz-data-2, quiz-data-details
+let state = {
+  current: 0, // 0: Intro, 1-10: Questions, 11: Result
+  answers: {},
+  notes: {},
+  openRisks: []
 };
 
 function render() {
   const appEl = document.getElementById('app');
   if (!appEl) return;
 
-  if (currentState.stepIndex >= -1 && currentState.stepIndex < QUIZ_STEPS.length) {
-    appEl.innerHTML = `
-      <main class="max-w-xl mx-auto px-4 pt-6 pb-8 safe-top safe-bottom">
-        ${renderQuizStep(currentState.stepIndex, currentState.answers)}
-      </main>
-    `;
+  updateTopbar();
+
+  if (state.current === 0) {
+    appEl.innerHTML = renderIntro(); // safe: static layout
+    bindIntroEvents();
+  } else if (state.current >= 1 && state.current <= 10) {
+    const step = QUIZ_STEPS[state.current - 1];
+    const showInsight1 = state.current === 1 && state.answers[1] === 0;
+    const showInsight4 = state.current === 4 && state.answers[4] !== undefined && state.answers[4] < 2;
+    appEl.innerHTML = renderQuizStep(step, state.answers, state.notes, showInsight1, showInsight4); // safe: static form elements
     bindQuizEvents();
-  } else if (currentState.stepIndex === QUIZ_STEPS.length) {
-    // Эран загрузки / симуляции
-    appEl.innerHTML = `
-      <main class="max-w-xl mx-auto px-4 pt-12 pb-8 safe-top safe-bottom">
-        <div class="dashboard-card p-8 text-center space-y-6 fade-in">
-          <div class="w-10 h-10 border-3 border-[#4F8CFF] border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <div class="space-y-3">
-            <span class="dashboard-badge">AI-ГЕНЕРАЦИЯ СИСТЕМЫ</span>
-            <h3 class="text-base font-extrabold text-white uppercase tracking-wider">Обработка данных...</h3>
-            <div class="font-mono text-xs text-[#4F8CFF] tracking-widest">▰▰▰▰▱▱▱</div>
-            <p class="text-xs text-[#A7B0C0] max-w-xs mx-auto">Анализ ресурсов • Расчёт потенциала • Построение связок</p>
-          </div>
-        </div>
-      </main>
-    `;
-    setTimeout(() => {
-      currentState.stepIndex++;
-      render();
-    }, 1200);
-  } else {
-    // Финальный результат
-    appEl.innerHTML = `
-      <main class="max-w-xl mx-auto px-4 pt-6 pb-8 safe-top safe-bottom">
-        ${renderResult(currentState.answers)}
-        <div class="text-center mt-6">
-          <button id="restart-btn" class="text-xs text-[#A7B0C0] hover:text-white underline font-mono btn-press">
-            ↺ Перезапустить симулятор v3.0
-          </button>
-        </div>
-      </main>
-    `;
+  } else if (state.current === 11) {
+    const res = calculateResult(state.answers);
+    if (state.openRisks.length === 0) {
+      const defaultRisks = res.risks.length ? res.risks : [7, 8, 9];
+      state.openRisks = [defaultRisks[0]];
+    }
+    appEl.innerHTML = renderResult(res.score, res.risks, res.title, res.lead, res.quote, res.decision, state.notes, state.openRisks); // safe: variables escaped
     bindResultEvents();
   }
+}
 
-  initIcons();
+function updateTopbar() {
+  const bar = document.getElementById('progressBar');
+  const text = document.getElementById('progressText');
+  const count = document.getElementById('progressCount');
+  if (!bar || !text || !count) return;
+
+  if (state.current === 0) {
+    bar.style.width = '0%';
+    text.textContent = 'Старт';
+    count.textContent = '0 / 10';
+  } else if (state.current === 11) {
+    bar.style.width = '100%';
+    text.textContent = 'Готово';
+    count.textContent = '10 / 10';
+  } else {
+    bar.style.width = `${(state.current / 10) * 100}%`;
+    const step = QUIZ_STEPS[state.current - 1];
+    text.textContent = step.title;
+    count.textContent = `${state.current} / 10`;
+  }
+}
+
+function bindIntroEvents() {
+  document.getElementById('start-btn')?.addEventListener('click', () => {
+    state.current = 1;
+    render();
+  });
 }
 
 function bindQuizEvents() {
-  const startBtn = document.getElementById('start-quiz-btn');
-  if (startBtn) {
-    startBtn.addEventListener('click', () => {
-      currentState.stepIndex = 0;
-      render();
-    });
-  }
+  document.getElementById('prev-btn')?.addEventListener('click', () => {
+    state.current = Math.max(0, state.current - 1);
+    render();
+  });
 
-  document.querySelectorAll('.quiz-opt-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const optId = btn.getAttribute('data-opt-id');
-      const currentStep = QUIZ_STEPS[currentState.stepIndex];
-      if (currentStep) {
-        currentState.answers[currentStep.id] = optId;
-        currentState.stepIndex++;
-        render();
-      }
-    });
+  document.getElementById('next-btn')?.addEventListener('click', () => {
+    const selected = document.querySelector(`input[name="q${state.current}"]:checked`);
+    if (!selected) {
+      alert("Выбери вариант. Партнёрство любит конкретику, даже если конкретика сопротивляется.");
+      return;
+    }
+    
+    state.answers[state.current] = Number(selected.value);
+    const textarea = document.getElementById(`note${state.current}`);
+    if (textarea) {
+      state.notes[state.current] = textarea.value.trim();
+    }
+
+    state.current++;
+    render();
   });
 }
 
 function bindResultEvents() {
-  const restartBtn = document.getElementById('restart-btn');
-  if (restartBtn) {
-    restartBtn.addEventListener('click', () => {
-      currentState.stepIndex = -1;
-      currentState.answers = {};
+  document.getElementById('restart-btn')?.addEventListener('click', () => {
+    state.current = 0;
+    state.answers = {};
+    state.notes = {};
+    state.openRisks = [];
+    render();
+  });
+
+  document.getElementById('download-btn')?.addEventListener('click', () => {
+    downloadMemo(state.answers, state.notes);
+  });
+
+  document.querySelectorAll('.risk-head').forEach(head => {
+    head.addEventListener('click', () => {
+      const card = head.parentElement;
+      const riskId = Number(card.getAttribute('data-risk-id'));
+      if (state.openRisks.includes(riskId)) {
+        state.openRisks = state.openRisks.filter(id => id !== riskId);
+      } else {
+        state.openRisks.push(riskId);
+      }
       render();
     });
-  }
+  });
 }
 
-function initApp() {
-  render();
-}
-
-initApp();
+// Initial Render
+document.addEventListener('DOMContentLoaded', render);
+export { state, render };

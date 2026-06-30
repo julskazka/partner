@@ -1,0 +1,117 @@
+/* css/components.css — Layout Cards, Options, and Button Elements */
+.card {
+  background: rgba(255, 253, 248, .94);
+  border: 1px solid rgba(222, 216, 202, .85);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: clamp(22px, 4vw, 42px);
+  backdrop-filter: blur(10px);
+}
+
+.quote {
+  margin: 26px 0;
+  padding: 20px 22px;
+  border-left: 5px solid var(--accent);
+  background: #fff7ef;
+  border-radius: 0 16px 16px 0;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.options {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: .18s ease;
+}
+
+.option:hover {
+  transform: translateY(-1px);
+  border-color: #b9ac96;
+}
+
+.option input {
+  margin-top: 3px;
+  accent-color: var(--accent);
+  transform: scale(1.2);
+}
+
+.option strong {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.option small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: none;
+  border-radius: 14px;
+  padding: 13px 18px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.primary {
+  background: var(--ink);
+  color: white;
+}
+
+.secondary {
+  background: var(--soft);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.accent {
+  background: var(--accent);
+  color: #fff;
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.step {
+  display: none;
+  animation: fade .25s ease;
+}
+
+.step.active {
+  display: block;
+}
+
+@keyframes fade {
+  from { opacity: .2; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 640px) {
+  .actions button {
+    flex: 1;
+  }
+}

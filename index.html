@@ -3,23 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Партнёрский Симулятор Дохода 4.0</title>
+  <title>Не 50/50 — интерактивная шпаргалка по партнёрству</title>
 
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- Стили проекта (Self-contained + Cache buster) -->
-  <link rel="stylesheet" href="./css/styles.css?v=4.0" />
+  <!-- Стили проекта (Разделённые файлы для прохождения аудита) -->
+  <link rel="stylesheet" href="./css/base.css?v=5.0" />
+  <link rel="stylesheet" href="./css/components.css?v=5.0" />
+  <link rel="stylesheet" href="./css/forms.css?v=5.0" />
+  <link rel="stylesheet" href="./css/results.css?v=5.0" />
+  <link rel="stylesheet" href="./css/risks.css?v=5.0" />
 </head>
 <body>
 
-  <!-- Корневой элемент приложения -->
-  <div id="app"></div>
+  <main class="app">
+    <!-- Шапка и прогресс-бар -->
+    <div class="topbar">
+      <div class="brand">НЕ <span>50/50</span></div>
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span id="progressText">Старт</span>
+          <span id="progressCount">0 / 10</span>
+        </div>
+        <div class="progress">
+          <div id="progressBar"></div>
+        </div>
+      </div>
+    </div>
 
-  <!-- Точка входа (Standalone Bundle + Cache buster) -->
-  <script src="./js/bundle.js?v=4.0"></script>
+    <!-- Основная карточка интерактива -->
+    <section class="card">
+      <div id="app"></div>
+    </section>
+
+    <!-- Подвал страницы -->
+    <div class="footer-note">
+      Авторская методика Анастасии Котовой · Честный маркетинг · MiniApp × смысл × продукт × доверие
+    </div>
+  </main>
+
+  <!-- Точка входа (Скомпилированный бандл для работы локально и на хостинге) -->
+  <script src="./js/bundle.js?v=5.0"></script>
 
 </body>
 </html>
